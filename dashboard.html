@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Erasmus+ AI Workshop — Cognitive Landscape Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23116978'/><circle cx='16' cy='13' r='5.5' fill='none' stroke='%23c87941' stroke-width='2'/><path d='M11 20 Q16 17 21 20' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='1.5' stroke-linecap='round'/><line x1='12' y1='23' x2='20' y2='23' stroke='rgba(255,255,255,0.35)' stroke-width='1.5' stroke-linecap='round'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -158,6 +159,19 @@ a { color: var(--teal-600); text-decoration: none; }
   white-space: nowrap;
 }
 .btn-print:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.btn-export {
+  background: var(--amber);
+  border: none;
+  color: #1a0e00;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+.btn-export:hover { filter: brightness(1.12); }
 
 /* ============================================================
    ACTIVE FILTER INDICATOR
@@ -685,6 +699,198 @@ a { color: var(--teal-600); text-decoration: none; }
 .insight-box h3 { font-family: var(--font-head); font-size: 1.05rem; margin-bottom: 10px; color: var(--text); }
 .insight-box p { font-size: 0.86rem; color: var(--text-2); line-height: 1.75; }
 .insight-box strong { color: var(--text); font-weight: 600; }
+
+/* ============================================================
+   CASE STUDY
+   ============================================================ */
+.casestudy-hero {
+  background: linear-gradient(135deg, var(--teal-900) 0%, var(--teal-800) 60%, #1a2a1a 100%);
+  color: #fff;
+  padding: 60px 24px 48px;
+  text-align: center;
+}
+.casestudy-hero h2 {
+  font-family: var(--font-head);
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #fff;
+}
+.casestudy-hero .cs-sub {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.65);
+  max-width: 640px;
+  margin: 0 auto 8px;
+  line-height: 1.7;
+}
+.casestudy-hero .cs-byline {
+  font-size: 0.8rem;
+  color: var(--amber);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.cs-timeline {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.cs-step {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 0 20px;
+  position: relative;
+}
+.cs-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 25px;
+  top: 52px;
+  bottom: -1px;
+  width: 2px;
+  background: var(--border);
+}
+.cs-icon-col { display: flex; flex-direction: column; align-items: center; }
+.cs-icon {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.cs-icon.human { background: var(--amber); color: #1a0e00; }
+.cs-icon.ai { background: var(--teal-600); color: #fff; }
+.cs-icon.both { background: linear-gradient(135deg, var(--teal-600), var(--amber)); color: #fff; }
+.cs-body {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+}
+.cs-body:last-child { margin-bottom: 0; }
+.cs-step-label {
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.cs-step-label.human { color: var(--amber); }
+.cs-step-label.ai { color: var(--teal-500); }
+.cs-step-label.both { color: var(--text-3); }
+.cs-step-title {
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.cs-step-time {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  background: var(--surface2);
+  color: var(--text-3);
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+.cs-step-desc {
+  font-size: 0.88rem;
+  color: var(--text-2);
+  line-height: 1.75;
+  margin-bottom: 12px;
+}
+.cs-step-desc:last-child { margin-bottom: 0; }
+.cs-code {
+  background: var(--teal-900);
+  color: #a8d8c8;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border-left: 3px solid var(--teal-500);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 10px 0;
+}
+.cs-bullets { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-direction: column; gap: 6px; }
+.cs-bullets li {
+  font-size: 0.86rem;
+  color: var(--text-2);
+  padding-left: 18px;
+  position: relative;
+  line-height: 1.6;
+}
+.cs-bullets li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--teal-500);
+  font-weight: 600;
+}
+.cs-stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+.cs-stat {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  text-align: center;
+  flex: 1;
+  min-width: 80px;
+}
+.cs-stat-val {
+  font-family: var(--font-head);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--teal-500);
+  line-height: 1;
+}
+.cs-stat-lbl { font-size: 0.66rem; color: var(--text-3); margin-top: 4px; }
+.cs-reflection {
+  background: linear-gradient(135deg, rgba(13,79,92,0.08), rgba(200,121,65,0.06));
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--amber);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  max-width: 860px;
+  margin: 0 auto 48px;
+}
+.cs-reflection h3 {
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  margin-bottom: 14px;
+  color: var(--text);
+}
+.cs-reflection p {
+  font-size: 0.9rem;
+  color: var(--text-2);
+  line-height: 1.8;
+  margin-bottom: 10px;
+}
+.cs-reflection p:last-child { margin-bottom: 0; }
+.cs-reflection strong { color: var(--text); font-weight: 600; }
+@media (max-width: 600px) {
+  .cs-timeline { padding: 32px 12px; }
+  .cs-step { grid-template-columns: 40px 1fr; gap: 0 12px; }
+  .cs-icon { width: 40px; height: 40px; font-size: 1rem; }
+  .cs-step:not(:last-child)::after { left: 19px; }
+  .cs-reflection { padding: 20px; margin: 0 12px 32px; }
+}
 </style>
 </head>
 <body>
@@ -703,8 +909,10 @@ a { color: var(--teal-600); text-decoration: none; }
     <button class="nav-link" onclick="navScrollTo('quotes', this)">Quotes</button>
     <button class="nav-link" onclick="navScrollTo('recs', this)">Recommendations</button>
     <button class="nav-link" onclick="navScrollTo('vocab', this)">Vocabulary</button>
+    <button class="nav-link" onclick="navScrollTo('casestudy', this)">Case Study</button>
     <div class="nav-spacer"></div>
     <div class="nav-controls">
+      <button class="btn-export" onclick="exportJSONL()">Export JSONL</button>
       <button class="btn-toggle" id="themeBtn" onclick="toggleTheme()">Dark mode</button>
       <button class="btn-print" onclick="window.print()">Print</button>
     </div>
@@ -1706,6 +1914,146 @@ a { color: var(--teal-600); text-decoration: none; }
   </div>
 </section>
 
+<!-- ============================================================
+     CASE STUDY
+     ============================================================ -->
+<section id="casestudy" class="section" style="padding:0;background:var(--surface2);">
+  <div class="casestudy-hero">
+    <h2>How This Was Made</h2>
+    <p class="cs-sub">A live case study in human–AI collaboration. One spec, one command, twenty minutes. The facilitator was at lunch.</p>
+    <p class="cs-byline">Prompt design: Magnús Smári Smárason &nbsp;·&nbsp; Analysis &amp; build: PAI (Claude Sonnet 4.6) &nbsp;·&nbsp; April 15, 2025</p>
+  </div>
+
+  <div class="cs-timeline">
+
+    <!-- Step 1 -->
+    <div class="cs-step">
+      <div class="cs-icon-col">
+        <div class="cs-icon human">✍</div>
+      </div>
+      <div class="cs-body">
+        <div class="cs-step-label human">Human — Magnús Smári</div>
+        <div class="cs-step-title">Step 1 — Write the Spec</div>
+        <div class="cs-step-time">~5 minutes</div>
+        <p class="cs-step-desc">After facilitating seven group discussions at the seminar, the raw material was seven messy speech-to-text transcript files. The challenge: turn 28KB of fragmented, filler-word-laden text into a strategic intelligence document before the afternoon session.</p>
+        <p class="cs-step-desc">The spec defined three things precisely:</p>
+        <ul class="cs-bullets">
+          <li><strong>The analytical lens</strong> — every utterance read through the cognitive shift frame: are participants treating AI as a tool or thinking WITH it?</li>
+          <li><strong>What to extract</strong> — pain points with domain + lens tags, mental models with supporting quotes, breakthrough moments, resistance patterns, vocabulary audit, cross-group synthesis with Gap Scores 1–5</li>
+          <li><strong>The dashboard design</strong> — 8 sections in order, deep teal + copper palette, Playfair Display headings, Chart.js, dark mode toggle, group/lens filters, print view, zero external dependencies</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="cs-step">
+      <div class="cs-icon-col">
+        <div class="cs-icon human">⌨</div>
+      </div>
+      <div class="cs-body">
+        <div class="cs-step-label human">Human — Magnús Smári</div>
+        <div class="cs-step-title">Step 2 — One Command</div>
+        <div class="cs-step-time">~30 seconds</div>
+        <p class="cs-step-desc">A single message sent to PAI before heading to lunch:</p>
+        <div class="cs-code">/loop every 10 minutes check the status of the project, if the dashboard is not ready and populated with data per the spec, launch an agent to keep working, do not stop until you have visibly inspected the dashboard and it is S-TIER and ready for demonstration, I will not be here! I will be in lunch with the people attending the seminar, so when I get back this must be ready!</div>
+        <p class="cs-step-desc">PAI received: <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:0.82rem;">spec.md</code> + seven <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:0.82rem;">.txt</code> transcript files. No further instructions. No check-ins.</p>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="cs-step">
+      <div class="cs-icon-col">
+        <div class="cs-icon ai">🧠</div>
+      </div>
+      <div class="cs-body">
+        <div class="cs-step-label ai">AI — PAI (Claude Sonnet 4.6)</div>
+        <div class="cs-step-title">Step 3 — Read &amp; Analyse All Seven Transcripts</div>
+        <div class="cs-step-time">~12 minutes</div>
+        <p class="cs-step-desc">PAI read every transcript in full, including STT artefacts, false starts, and [inaudible] markers. The instruction was explicit: <em>"The raw language is data — preserve nuance when quoting, even when messy."</em></p>
+        <div class="cs-stat-row">
+          <div class="cs-stat"><div class="cs-stat-val">7</div><div class="cs-stat-lbl">Transcripts read</div></div>
+          <div class="cs-stat"><div class="cs-stat-val">~28KB</div><div class="cs-stat-lbl">Raw text processed</div></div>
+          <div class="cs-stat"><div class="cs-stat-val">30</div><div class="cs-stat-lbl">Pain points mapped</div></div>
+          <div class="cs-stat"><div class="cs-stat-val">3.7</div><div class="cs-stat-lbl">Avg Gap Score (of 5)</div></div>
+        </div>
+        <ul class="cs-bullets" style="margin-top:14px;">
+          <li>Identified cognitive lens for every distinct pain point (TOOL_THINKING, FEAR_BASED, WORKFLOW_STUCK, etc.)</li>
+          <li>Named the dominant mental model in each group — "Efficiency Tool", "Unreliable Employee", "Cheating Machine", "Regulatory Shield", "Search Engine", "Autonomous Agent"</li>
+          <li>Flagged 7 breakthrough moments where a participant stepped outside the tool frame</li>
+          <li>Conducted vocabulary audit: agency language vs. passive framing vs. threat vs. empowerment — and crucially, noted what was <em>absent</em>: no participant ever said "thinking with AI" or "collaborative intelligence"</li>
+          <li>Computed Gap Scores for each cluster: how far is tool-thinking from thinking-with-AI for this problem?</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="cs-step">
+      <div class="cs-icon-col">
+        <div class="cs-icon ai">⚙</div>
+      </div>
+      <div class="cs-body">
+        <div class="cs-step-label ai">AI — PAI (Claude Sonnet 4.6)</div>
+        <div class="cs-step-title">Step 4 — Build the Dashboard</div>
+        <div class="cs-step-time">~8 minutes</div>
+        <p class="cs-step-desc">PAI wrote a single self-contained HTML file from scratch — no framework, no build step, no external dependencies. All CSS inline, Chart.js loaded from CDN with graceful fallback.</p>
+        <div class="cs-stat-row">
+          <div class="cs-stat"><div class="cs-stat-val">1,945</div><div class="cs-stat-lbl">Lines of code</div></div>
+          <div class="cs-stat"><div class="cs-stat-val">8</div><div class="cs-stat-lbl">Dashboard sections</div></div>
+          <div class="cs-stat"><div class="cs-stat-val">0</div><div class="cs-stat-lbl">JS errors (QA-verified)</div></div>
+          <div class="cs-stat"><div class="cs-stat-val">~70KB</div><div class="cs-stat-lbl">Final file size</div></div>
+        </div>
+        <ul class="cs-bullets" style="margin-top:14px;">
+          <li>QA-tested with Playwright browser automation — all 8 sections, both charts, filters, accordion, dark mode</li>
+          <li>Scroll spy, smooth scroll nav, CSS print stylesheet, IntersectionObserver gap-bar animations</li>
+          <li>Every quote is verbatim from the transcripts. Every gap score is reasoned from the analysis.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="cs-step">
+      <div class="cs-icon-col">
+        <div class="cs-icon ai">🚀</div>
+      </div>
+      <div class="cs-body">
+        <div class="cs-step-label ai">AI — PAI (Claude Sonnet 4.6)</div>
+        <div class="cs-step-title">Step 5 — GitHub Repo &amp; Vercel Deploy</div>
+        <div class="cs-step-time">~3 minutes</div>
+        <p class="cs-step-desc">Without being asked, PAI initialized a git repository, committed the dashboard, created a public GitHub repo, and deployed to Vercel via API — all while Magnús was still at lunch.</p>
+        <ul class="cs-bullets">
+          <li>Raw transcript files excluded from the repo (participant data stays local)</li>
+          <li>Vercel deployment triggered via REST API, polled until READY</li>
+          <li>Live URL confirmed returning HTTP 200 with correct content before declaring done</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="cs-step">
+      <div class="cs-icon-col">
+        <div class="cs-icon human">👋</div>
+      </div>
+      <div class="cs-body">
+        <div class="cs-step-label human">Human — Magnús Smári</div>
+        <div class="cs-step-title">Step 6 — Returns from Lunch</div>
+        <div class="cs-step-time">~20 min total, start to deployed URL</div>
+        <p class="cs-step-desc">Magnús returned to a live, deployed, QA-verified dashboard. No debugging. No layout fixes. No placeholder data. The afternoon session had a strategic intelligence document built on the morning's conversations.</p>
+        <p class="cs-step-desc">The dashboard was then shared with seminar participants as a live URL — and as an example of exactly the kind of human–AI collaboration the workshop was trying to provoke.</p>
+      </div>
+    </div>
+
+  </div><!-- /.cs-timeline -->
+
+  <div class="cs-reflection">
+    <h3>What This Demonstrates</h3>
+    <p><strong>The prompt is the work.</strong> The analysis quality is bounded by the specification quality. Vague prompts produce generic outputs. The spec written above — with its precise analytical categories, lens definitions, and design requirements — is the intellectual contribution that made this possible. PAI executed it; Magnús Smári designed it.</p>
+    <p><strong>AI reads without fatigue.</strong> Seven transcripts, 28KB of messy speech-to-text, processed with consistent analytical attention across all of them. A human analyst would have started abbreviating by transcript four.</p>
+    <p><strong>The bottleneck shifts, not disappears.</strong> This took twenty minutes instead of several days — but it took deep domain expertise to write the spec, and human judgment to decide what the analytical lens should be. AI removed the execution bottleneck. The thinking bottleneck remains human.</p>
+    <p><strong>The cognitive shift is visible in the output.</strong> This dashboard was produced by a human thinking WITH an AI system — not by a human delegating TO an AI tool. That is exactly the shift the workshop was trying to provoke in participants. The medium is the message.</p>
+  </div>
+
+</section>
+
 <!-- FOOTER -->
 <footer style="background:var(--teal-900);color:rgba(255,255,255,0.45);padding:28px 24px;text-align:center;font-size:0.76rem;line-height:1.8;">
   <div style="max-width:1400px;margin:0 auto;">
@@ -1744,7 +2092,7 @@ function navScrollTo(id, btn) {
 }
 
 // Passive scroll spy
-const sectionIds = ['overview','lens','clusters','models','breakthroughs','quotes','recs','vocab'];
+const sectionIds = ['overview','lens','clusters','models','breakthroughs','quotes','recs','vocab','casestudy'];
 window.addEventListener('scroll', () => {
   const pos = window.scrollY + 80;
   sectionIds.forEach((id, i) => {
@@ -1939,6 +2287,252 @@ const barObserver = new IntersectionObserver((entries) => {
 document.querySelectorAll('.gap-bar-fill[data-target]').forEach(bar => {
   barObserver.observe(bar);
 });
+
+/* ============================================================
+   JSONL EXPORT
+   ============================================================ */
+function exportJSONL() {
+  const lines = [];
+
+  // --- Context record ---
+  lines.push(JSON.stringify({
+    type: "context",
+    event: "Erasmus+ Teaching Mobility AI Workshop",
+    date: "2025-04-15",
+    location: "University of Akureyri, Iceland",
+    groups: 7,
+    participants_approx: 35,
+    countries: 6,
+    central_lens: "Participants are applying AI like any other software tool. They need to make a cognitive shift: from using AI as a tool TO thinking WITH AI as a collaborative intelligence. They are cognitively locked inside existing mental models and problem frames.",
+    total_pain_points: 30,
+    avg_gap_score: 3.7,
+    dominant_lens: "TOOL_THINKING",
+    key_absence: "No participant across any group used the phrases 'thinking with AI', 'reasoning together', or 'collaborative intelligence'.",
+    dashboard_url: "https://erasmus-ai-workshop-dashboard.vercel.app",
+    analysis_by: "PAI (Claude Sonnet 4.6)",
+    prompt_design_by: "Magnús Smári Smárason"
+  }));
+
+  // --- Pain Clusters ---
+  const clusterData = [
+    { cluster: "Assessment Redesign", groups: ["G4","G5"], domain: "Strategic", gap_score: 5, lens: "WORKFLOW_STUCK", count: 5,
+      description: "AI has rendered traditional summative assessment indefensible, but institutional response is restriction rather than redesign.",
+      tool_mode_response: "Detect AI use. Return to proctored, closed-book formats.",
+      thinking_with_ai_response: "Redesign assessment to test AI-augmented reasoning as the target skill. The question is not 'did you use AI?' but 'can you think critically with it?'",
+      verbatim_quotes: [
+        { text: "AI didn't create this problem.", group: "G4" },
+        { text: "Every subject has to teach the students to use AI within that subject.", group: "G4" },
+        { text: "The four or five day home exam is a very neat learning process... they are making them to school exams instead because of AI, and that is very unfortunate.", group: "G4" }
+      ]},
+    { cluster: "Ethics & Data Protection as Avoidance Shield", groups: ["G1","G2"], domain: "Cultural", gap_score: 5, lens: "FEAR_BASED", count: 4,
+      description: "Ethics discourse is weaponised as a reason not to engage with AI — without actual practice of those principles.",
+      tool_mode_response: "Defer to ethics frameworks. Wait for policy before using AI.",
+      thinking_with_ai_response: "Use AI as the first test case for your stated ethical concerns. Ask it where it gets its data. Ethical engagement starts with understanding, not abstention.",
+      verbatim_quotes: [
+        { text: "We have to be very ethical about implementing AI. I'm not going to learn about AI, but I know about ethics — so it becomes a protection mechanism.", group: "G2" },
+        { text: "When they hit the next terms and conditions on an app they just hit accept to continue.", group: "G2" }
+      ]},
+    { cluster: "Agentic AI Oversight Deficit", groups: ["G7"], domain: "Technical / Trust", gap_score: 5, lens: "FEAR_BASED", count: 3,
+      description: "Participants encounter agentic tools without literacy to evaluate or constrain them, leading to rejection or reckless adoption.",
+      tool_mode_response: "Avoid agentic tools entirely. Or install and give free rein.",
+      thinking_with_ai_response: "Build oversight literacy progressively. Map exactly what authority you grant the system at each step.",
+      verbatim_quotes: [
+        { text: "You are basically hiring a tier one AI system to represent you, but you're unable to have oversight of what it's doing. It's just doing magic stuff.", group: "G7" },
+        { text: "Open Claw is like an end game boss. You have to be able to go through until you've gained understanding.", group: "G7" }
+      ]},
+    { cluster: "Fragmented Information Architecture", groups: ["G1","G3"], domain: "Operational", gap_score: 4, lens: "SYSTEMIC_BLIND_SPOT", count: 5,
+      description: "The same information lives in 4–5 places, managed by different people, with no guarantee of consistency.",
+      tool_mode_response: "Build a centralised portal. Assign an information owner.",
+      thinking_with_ai_response: "Deploy AI as the unified access layer over fragmented systems — not to replace the architecture, but to make it navigable.",
+      verbatim_quotes: [
+        { text: "The same information posted five different places managed by three different people — you don't know if the information is correct in all the sources.", group: "G1" },
+        { text: "There are big discussions. Regulations I think every institution does — not centralised, hard to find. There's like a lot of PDFs.", group: "G3" }
+      ]},
+    { cluster: "Accountability at Scale", groups: ["G3"], domain: "Trust", gap_score: 4, lens: "SYSTEMIC_BLIND_SPOT", count: 3,
+      description: "When AI accelerates throughput in high-stakes decisions, humans absorb accountability for outcomes they cannot audit.",
+      tool_mode_response: "Keep humans in the loop (manual review of everything).",
+      thinking_with_ai_response: "Design explicit accountability protocols: which decisions can AI pre-sort, which require full human review, what does 'I reviewed this' actually mean?",
+      verbatim_quotes: [
+        { text: "Instead of evaluating 10 students per day you would do 100. You wouldn't be able to follow what the AI is doing. You would just accept its output — you would be taking responsibility for a system you don't understand.", group: "G3" }
+      ]},
+    { cluster: "Technical Competence Ceiling", groups: ["G6","G7"], domain: "Technical", gap_score: 3, lens: "TOOL_THINKING", count: 4,
+      description: "Participants jump to complex use cases without foundational AI interaction skills, fail, and attribute it to AI unreliability.",
+      tool_mode_response: "Get AI training. Follow a course. Learn prompting.",
+      thinking_with_ai_response: "Use AI to tutor you on how to use AI. Treat failed interactions as diagnostic data, not verdicts on the technology.",
+      verbatim_quotes: [
+        { text: "When I asked him give me the data, this not worked, so the data could not be from their function.", group: "G6" },
+        { text: "You go straight into a complex use case of ChatGPT — like your students who have to train themselves, you have to build your training and knowledge.", group: "G6" }
+      ]},
+    { cluster: "Missing AI Policy Framework", groups: ["G4","G5"], domain: "Strategic", gap_score: 3, lens: "WORKFLOW_STUCK", count: 4,
+      description: "Institutions lack coherent AI policies, creating a vacuum where faculty make ad hoc decisions and the dominant posture is to wait.",
+      tool_mode_response: "Wait for institutional AI policy before acting.",
+      thinking_with_ai_response: "Use the policy vacuum as an invitation: draft your own departmental AI principles, use them, iterate, share upstream.",
+      verbatim_quotes: [
+        { text: "How to solve the paradox of encouraging students to use AI but not for exams.", group: "G4" }
+      ]},
+    { cluster: "Specialist Scarcity Bottleneck", groups: ["G2"], domain: "Strategic", gap_score: 2, lens: "TOOL_THINKING", count: 2,
+      description: "Institutions concentrate AI capability in 1–2 specialists who become overwhelmed — AI as centralised luxury rather than distributed capacity.",
+      tool_mode_response: "Hire more AI specialists.",
+      thinking_with_ai_response: "Build self-service AI literacy across domain experts so the specialist role shifts from doing to enabling and governing.",
+      verbatim_quotes: [
+        { text: "That guy who is working with AI development is overwhelmed by the requests... we have one AI specialist and are hiring a second one — for 60,000 students.", group: "G2" }
+      ]}
+  ];
+  clusterData.forEach(c => lines.push(JSON.stringify({ type: "pain_cluster", ...c })));
+
+  // --- Mental Models ---
+  const models = [
+    { model: "Efficiency Tool Model", prevalence: "5/7 groups", groups: ["G1","G3","G5","G6","G7"],
+      metaphor: "AI is a software system that reduces the time it takes me to do tasks I already do.",
+      dominant_framing: "TOOL_THINKING",
+      verbatim_quotes: ["I see this tool more from the teaching perspective. I want a tool that allows me to reduce work hours from the human side. (G5)"] },
+    { model: "Unreliable Employee Model", prevalence: "4/7 groups", groups: ["G2","G3","G6","G7"],
+      metaphor: "AI produces outputs but makes things up — like a junior staffer you can't fully trust.",
+      dominant_framing: "FEAR_BASED",
+      verbatim_quotes: ["I don't trust it at all. (G2)", "He gave me some inspiration but the data did not work. (G6)"] },
+    { model: "Cheating Machine Model", prevalence: "2/7 groups", groups: ["G4","G5"],
+      metaphor: "AI is primarily a threat to academic integrity.",
+      dominant_framing: "FEAR_BASED",
+      verbatim_quotes: ["How to solve the paradox of encouraging students to use AI but not for exams. (G4)"] },
+    { model: "Regulatory Shield Model", prevalence: "2/7 groups", groups: ["G1","G2"],
+      metaphor: "AI is subject to ethics and policy frameworks — wait for those before engaging.",
+      dominant_framing: "FEAR_BASED",
+      verbatim_quotes: ["We have to be very ethical about implementing AI. (G2)"] },
+    { model: "Search Engine / Answer Machine", prevalence: "2/7 groups", groups: ["G3","G6"],
+      metaphor: "AI should return accurate answers to direct queries — like a smarter search.",
+      dominant_framing: "SURFACE_USE",
+      verbatim_quotes: ["When I asked him give me the formula, he gave me the formula. (G6)"] },
+    { model: "Autonomous Agent / Dangerous Unknown", prevalence: "1/7 groups", groups: ["G7"],
+      metaphor: "Agentic AI acts autonomously with unclear consequences — a power requiring expert handling.",
+      dominant_framing: "FEAR_BASED",
+      verbatim_quotes: ["You basically just give it free reign on your computer... it's doing magic stuff. (G7)"] }
+  ];
+  models.forEach(m => lines.push(JSON.stringify({ type: "mental_model", ...m })));
+
+  // --- Breakthrough Moments ---
+  const breakthroughs = [
+    { group: "G4", type: "Reframing", quote: "AI didn't create this problem.",
+      significance: "Correctly identifies assessment dysfunction predates AI. Shifts from 'how do we protect assessment from AI?' to 'how do we fix assessment, with AI as the forcing function?'" },
+    { group: "G2", type: "Meta-critique", quote: "Ethics as protection mechanism.",
+      significance: "Facilitator names the pattern in real time: ethics discourse used as a shield against engagement, not as an operational framework." },
+    { group: "G4", type: "Integration thinking", quote: "Every subject must teach AI within its discipline.",
+      significance: "Moves from prohibition frame to integration frame. Closest to 'thinking with AI' in the entire corpus — AI literacy as domain-specific, not a generic add-on." },
+    { group: "G3", type: "Novel concept coined", quote: "Responsibility sponge.",
+      significance: "Facilitator coins a term for the accountability problem. Participants immediately adopt it. Near-breakthrough in thinking about human-AI accountability design." },
+    { group: "G4", type: "Historical reframe", quote: "Universities have changed through centuries — we're being called to do it faster.",
+      significance: "Locates current disruption in a long institutional arc. Reduces panic, increases strategic perspective." },
+    { group: "G3", type: "Thinking-with-AI demonstration", quote: "User stories to simulate the student through the system.",
+      significance: "Facilitator demonstrates AI-as-thinking-partner. Uses AI to simulate the user experience of a broken institutional system — genuine systemic thinking." },
+    { group: "G7", type: "Progression metaphor", quote: "Open Claw is an end game boss.",
+      significance: "Despite tool-thinking frame, correctly identifies AI capability as a ladder, not a binary switch. Implies a growth model, not a fear model." }
+  ];
+  breakthroughs.forEach(b => lines.push(JSON.stringify({ type: "breakthrough_moment", ...b })));
+
+  // --- Facilitator Recommendations ---
+  const recs = [
+    { number: 1, title: "The Ethics Inversion Exercise",
+      observed_pattern: "Ethics and data protection discourse used as engagement shields (G2, G4)",
+      cognitive_shift_targeted: "From compliance-framing to curiosity-as-ethics",
+      exercise: "Ask participants to interrogate an AI system about their specific ethical concern — ask it where it gets its data, what its training included, how it handles copyright. Then evaluate the quality of its answer. Ethical engagement starts with understanding, not abstention." },
+    { number: 2, title: "'Dangerous or Not?' Assessment Redesign",
+      observed_pattern: "Assessment seen primarily as AI-cheating prevention rather than competency verification (G4, G5)",
+      cognitive_shift_targeted: "From exclusion to integration — AI literacy as an assessable graduate attribute",
+      exercise: "In pairs, design one assessment task that requires evidence of thinking with AI. The student must show their reasoning process, their prompting strategy, and their critical evaluation of the result." },
+    { number: 3, title: "The Responsibility Sponge Audit",
+      observed_pattern: "Professionals absorbing accountability for AI-assisted decisions they cannot audit (G3)",
+      cognitive_shift_targeted: "From passive throughput to active accountability design",
+      exercise: "Map three decisions in your current role where AI might assist. For each: (a) what does AI decide/recommend, (b) what evidence would tell you it was wrong, (c) who carries responsibility if it fails. If you can't answer (b), you've found the gap." },
+    { number: 4, title: "Progressive Authority Ladder",
+      observed_pattern: "Binary relationship with agentic AI — either full rejection or unconstrained deployment (G7)",
+      cognitive_shift_targeted: "From fear-based avoidance to graduated trust-building",
+      exercise: "Stage AI use in three tiers: Tier 1 (read-only, advisory), Tier 2 (draft and propose), Tier 3 (act within defined scope). Spend one week at Tier 1 before granting Tier 2 access to any new AI tool." },
+    { number: 5, title: "User Story Simulation Sprint",
+      observed_pattern: "Institutional problems described in abstract terms without experiencing them from the user's perspective (G1, G3)",
+      cognitive_shift_targeted: "From symptom-naming to systems-thinking with AI as simulation partner",
+      exercise: "Create two student personas. Walk an AI through your institution's information systems as each persona. Document every point of friction. You will find the problems you already know about — and several you didn't." },
+    { number: 6, title: "Vocabulary Swap Intervention",
+      observed_pattern: "Passive and tool-framing language dominates how participants describe AI interactions (all groups)",
+      cognitive_shift_targeted: "Language shapes cognitive model — changing vocabulary changes possibility space",
+      exercise: "Rewrite one current workflow description replacing all passive/tool verbs with collaborative ones: 'I thought through X with the AI' | 'We worked out' | 'I asked it to reason about.' Discuss how the rewrite changes what you imagine the interaction could be." },
+    { number: 7, title: "Veil of Ignorance Design Sprint",
+      observed_pattern: "Every group defaults to problem-solving within current constraints (G1, G2, G3, G5)",
+      cognitive_shift_targeted: "From problem-solving mode to ideal-state design mode",
+      exercise: "12 minutes: Step 1 (3 min): suspend all knowledge of current systems, budgets, and policies. Step 2 (6 min): describe what the ideal state of one university process looks and feels like as a lived experience. Step 3 (3 min): identify one feature of that ideal state AI could enable today." }
+  ];
+  recs.forEach(r => lines.push(JSON.stringify({ type: "facilitator_recommendation", ...r })));
+
+  // --- Key Quotes ---
+  const quotes = [
+    { group: "G1", lens: "SYSTEMIC_BLIND_SPOT", domain: "Cultural", text: "They work in the cube, and they don't see the big picture of the united mission of the university." },
+    { group: "G2", lens: "FEAR_BASED", domain: "Cultural", text: "We have to be very ethical about implementing AI. I'm not going to learn about AI, but I know about ethics — so it becomes a protection mechanism." },
+    { group: "G2", lens: "FEAR_BASED", domain: "Identity", text: "I am a creative person. I worry about copyright, and I don't trust you. That's the start of the conversation." },
+    { group: "G2", lens: "FEAR_BASED", domain: "Cultural", text: "When they hit the next terms and conditions they just hit accept to continue — with their data." },
+    { group: "G2", lens: "POTENTIAL_UNLOCKED", domain: "Cultural", text: "When you have understanding of how it uses training data — then you can start being articulate about it." },
+    { group: "G2", lens: "TOOL_THINKING", domain: "Strategic", text: "That guy who is working with AI development is overwhelmed by the requests... we have one AI specialist and are hiring a second one — for 60,000 students." },
+    { group: "G3", lens: "WORKFLOW_STUCK", domain: "Operational", text: "Which regulation do I need to look at? The university level? The study programme? The module?" },
+    { group: "G3", lens: "SYSTEMIC_BLIND_SPOT", domain: "Trust", text: "You would just accept the AI's output — you would be taking responsibility for a system you don't understand." },
+    { group: "G3", lens: "WORKFLOW_STUCK", domain: "Trust", text: "The decision will differ depending on who checks it." },
+    { group: "G4", lens: "POTENTIAL_UNLOCKED", domain: "Strategic", text: "AI didn't create this problem." },
+    { group: "G4", lens: "POTENTIAL_UNLOCKED", domain: "Strategic", text: "Every subject has to teach the students to use AI within that subject — that is what they need to learn." },
+    { group: "G4", lens: "WORKFLOW_STUCK", domain: "Cultural", text: "The four or five day home exam is a very neat learning process... they are making them to school exams instead because of AI, and that is very unfortunate." },
+    { group: "G5", lens: "TOOL_THINKING", domain: "Operational", text: "I see this tool more from the teaching perspective. I want a tool that allows me to reduce work hours from the human side." },
+    { group: "G6", lens: "SURFACE_USE", domain: "Operational", text: "We tried to name a problem and then it becomes like we have no problem at all because it's already solved." },
+    { group: "G6", lens: "TOOL_THINKING", domain: "Technical", text: "When I asked him give me the data, this not worked — so the data could not be from their function." },
+    { group: "G7", lens: "FEAR_BASED", domain: "Trust", text: "You are basically hiring a tier one AI system to represent you, but you're unable to have oversight of what it's doing. It's just doing magic stuff." },
+    { group: "G7", lens: "POTENTIAL_UNLOCKED", domain: "Technical", text: "Open Claw is like an end game boss. You have to be able to go through until you've gained understanding." }
+  ];
+  quotes.forEach(q => lines.push(JSON.stringify({ type: "verbatim_quote", ...q })));
+
+  // --- Vocabulary Fingerprint ---
+  const vocab = [
+    { category: "Agency Language", framing: "treats_ai_as_autonomous_actor",
+      terms: ["he gave me", "he knows", "he thinks", "he decided", "he told me", "ask him"],
+      note: "Subtle mismodel: participants grant AI a persistent identity and intent it does not have." },
+    { category: "Passive / Transactional Framing", framing: "input_output_model",
+      terms: ["you feed it", "it outputs", "it generates", "it creates", "it gave", "it produces"],
+      note: "Positions participant as operator, AI as machine — no collaborative cognition implied." },
+    { category: "Threat / Risk Language", framing: "fear_and_danger",
+      terms: ["dangerous", "end game boss", "responsibility sponge", "free reign", "cheating", "magic stuff", "liability"],
+      note: "Risk framing without risk literacy — participants sense danger but lack vocabulary to specify it." },
+    { category: "Empowerment Language", framing: "optimistic_capability",
+      terms: ["immensely powerful", "very capable", "solve", "automate", "reduce hours", "simulate", "unlock"],
+      note: "Present but minority framing. Remains tool-oriented ('it will do X for me')." },
+    { category: "Tool / Instrumental Language", framing: "purely_transactional",
+      terms: ["use it", "tool", "software", "system", "platform", "install", "set up", "deploy"],
+      note: "Dominant framing across all groups. AI as appliance, not collaborator." },
+    { category: "ABSENT — Collaborative Intelligence Language", framing: "absent",
+      terms: ["thinking with AI", "reasoning together", "collaborative intelligence", "thinking partner", "we worked out", "co-created"],
+      note: "CRITICAL FINDING: None of these phrases appeared in any transcript. The cognitive shift has not occurred at the language level." }
+  ];
+  vocab.forEach(v => lines.push(JSON.stringify({ type: "vocabulary_fingerprint", ...v })));
+
+  // --- Case Study Meta ---
+  lines.push(JSON.stringify({
+    type: "case_study_meta",
+    title: "How This Dashboard Was Made",
+    prompt_author: "Magnús Smári Smárason",
+    analysis_and_build: "PAI (Claude Sonnet 4.6 via Claude Code)",
+    time_from_command_to_live_url: "~20 minutes",
+    transcripts_processed: 7,
+    raw_input_size_kb: 28,
+    output_lines_of_code: 1945,
+    output_file_size_kb: 70,
+    qa_method: "Playwright browser automation (QATester agent)",
+    js_errors_found: 0,
+    deployment: "GitHub + Vercel (via REST API)",
+    key_insight: "The prompt IS the work. Vague prompts produce generic outputs. The analytical framework, lens definitions, domain taxonomy, and design requirements were human intellectual contributions. PAI executed them at speed. The bottleneck shifted from execution to specification."
+  }));
+
+  const blob = new Blob([lines.join('\n') + '\n'], { type: 'application/x-ndjson' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'erasmus-ai-workshop-analysis.jsonl';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 </script>
 </body>
 </html>
