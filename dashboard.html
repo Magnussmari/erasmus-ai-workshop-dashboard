@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Erasmus+ AI Workshop — Cognitive Landscape Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  --teal-900: #062d36;
+  --teal-800: #0a3f4a;
+  --teal-700: #0d4f5c;
+  --teal-600: #116978;
+  --teal-500: #158496;
+  --teal-300: #7ecadc;
+  --teal-100: #d4f0f6;
+  --teal-50:  #eef9fc;
+  --amber:     #c87941;
+  --amber-lt:  #f0c99a;
+  --amber-bg:  #fdf3e8;
+  --red:       #b03a3a;
+  --red-lt:    #f0bcbc;
+  --red-bg:    #fdf0f0;
+  --green:     #2e7d5a;
+  --green-lt:  #a8d8be;
+  --green-bg:  #eef7f2;
+  --bg:        #f5f1ec;
+  --surface:   #ffffff;
+  --surface2:  #f0ece7;
+  --border:    #ddd8d0;
+  --text:      #1a1612;
+  --text-2:    #5a5248;
+  --text-3:    #8a8076;
+  --font-head: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --radius:    8px;
+  --radius-lg: 16px;
+  --shadow:    0 2px 12px rgba(0,0,0,0.07);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+}
+[data-theme="dark"] {
+  --bg:       #0c1a1f;
+  --surface:  #132028;
+  --surface2: #1a2d36;
+  --border:   #274050;
+  --text:     #e8e0d4;
+  --text-2:   #9ab0bc;
+  --text-3:   #6a8898;
+  --teal-50:  #0f2530;
+  --teal-100: #143040;
+  --amber-bg: #2a1d0f;
+  --red-bg:   #2a0f0f;
+  --green-bg: #0f2219;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  transition: background 0.3s, color 0.3s;
+}
+h1, h2, h3, h4 { font-family: var(--font-head); line-height: 1.2; }
+a { color: var(--teal-600); text-decoration: none; }
+
+/* ============================================================
+   STICKY NAV
+   ============================================================ */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--teal-800);
+  color: #fff;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+}
+.nav-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-inner::-webkit-scrollbar { display: none; }
+.nav-brand {
+  font-family: var(--font-head);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--teal-300);
+  white-space: nowrap;
+  padding: 14px 16px 14px 0;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+.nav-link {
+  color: rgba(255,255,255,0.75);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  padding: 14px 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.2s;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+}
+.nav-link:hover { color: #fff; }
+.nav-link.active { color: var(--amber-lt); border-bottom: 2px solid var(--amber); }
+.nav-spacer { flex: 1; min-width: 8px; }
+.nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding-left: 8px;
+  border-left: 1px solid rgba(255,255,255,0.1);
+  margin-left: 8px;
+}
+.btn-toggle {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 0.72rem;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.btn-toggle:hover { background: rgba(255,255,255,0.2); }
+.btn-print {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.75);
+  font-size: 0.72rem;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+.btn-print:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+/* ============================================================
+   ACTIVE FILTER INDICATOR
+   ============================================================ */
+.filter-bar {
+  background: var(--teal-900);
+  padding: 6px 24px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--teal-300);
+}
+.filter-bar.visible { display: flex; }
+.filter-tag {
+  background: var(--teal-700);
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+}
+.filter-x { cursor: pointer; opacity: 0.7; font-size: 1rem; line-height: 1; }
+.filter-x:hover { opacity: 1; }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.section {
+  padding: 64px 0;
+  border-bottom: 1px solid var(--border);
+}
+.section:last-child { border-bottom: none; }
+.section-header { margin-bottom: 40px; }
+.section-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--teal-600);
+  margin-bottom: 8px;
+  display: block;
+}
+.section-title { font-size: 2rem; color: var(--text); margin-bottom: 12px; }
+.section-sub { color: var(--text-2); max-width: 640px; font-size: 0.93rem; }
+
+/* ============================================================
+   HERO / OVERVIEW
+   ============================================================ */
+.hero {
+  background: linear-gradient(135deg, var(--teal-800) 0%, var(--teal-900) 100%);
+  color: #fff;
+  padding: 56px 0 48px;
+}
+.hero-inner { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+.hero-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--teal-300);
+  margin-bottom: 12px;
+}
+.hero-title {
+  font-family: var(--font-head);
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.hero-sub { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 40px; }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 16px;
+  margin-bottom: 40px;
+}
+.stat-card {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  text-align: center;
+}
+.stat-num {
+  font-family: var(--font-head);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label { font-size: 0.68rem; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* SPECTRUM VERDICT */
+.verdict-panel {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+}
+.verdict-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal-300);
+  margin-bottom: 8px;
+}
+.verdict-title { font-family: var(--font-head); font-size: 1.3rem; margin-bottom: 20px; line-height: 1.3; }
+.spectrum-track {
+  height: 12px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 6px;
+  position: relative;
+  margin-bottom: 8px;
+}
+.spectrum-fill {
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #b03a3a 0%, #c87941 35%, #2e7d5a 100%);
+  width: 28%;
+  position: relative;
+}
+.spectrum-marker {
+  position: absolute;
+  right: -6px;
+  top: -6px;
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border-radius: 50%;
+  border: 3px solid var(--amber);
+  box-shadow: 0 0 0 4px rgba(200,121,65,0.3);
+}
+.spectrum-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.63rem;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 20px;
+}
+.verdict-desc { font-size: 0.88rem; color: rgba(255,255,255,0.7); line-height: 1.75; }
+
+/* ============================================================
+   COGNITIVE LENS SECTION
+   ============================================================ */
+.lens-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 40px;
+  align-items: start;
+}
+@media (max-width: 900px) { .lens-layout { grid-template-columns: 1fr; } }
+.chart-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow);
+  position: relative;
+  height: 380px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chart-center-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+.chart-center-label .big { font-family: var(--font-head); font-size: 2rem; font-weight: 700; color: var(--text); }
+.chart-center-label .small { font-size: 0.68rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; }
+.chart-fallback { display: none; padding: 24px; text-align: center; color: var(--text-3); font-size: 0.85rem; }
+.lens-legend { display: flex; flex-direction: column; gap: 10px; }
+.lens-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.lens-item:hover, .lens-item.active { border-color: var(--teal-500); box-shadow: var(--shadow); }
+.lens-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.lens-name { font-size: 0.78rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.lens-desc { font-size: 0.73rem; color: var(--text-2); line-height: 1.4; }
+.lens-count { margin-left: auto; font-family: var(--font-head); font-size: 1.25rem; font-weight: 700; color: var(--teal-600); flex-shrink: 0; }
+
+/* ============================================================
+   PAIN POINT CLUSTERS
+   ============================================================ */
+.clusters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 22px;
+}
+@media (max-width: 600px) { .clusters-grid { grid-template-columns: 1fr; } }
+.cluster-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s;
+}
+.cluster-card:hover { box-shadow: var(--shadow-lg); }
+.cluster-head {
+  padding: 22px 22px 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.gap-badge {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head);
+  font-size: 1.1rem; font-weight: 700;
+  flex-shrink: 0;
+}
+.gap-5 { background: var(--red-bg); color: var(--red); border: 2px solid var(--red-lt); }
+.gap-4 { background: #fff3e8; color: #a0522d; border: 2px solid #f4c090; }
+.gap-3 { background: #fffbe8; color: #856a00; border: 2px solid #f0dc80; }
+.gap-2 { background: var(--green-bg); color: var(--green); border: 2px solid var(--green-lt); }
+.gap-1 { background: var(--teal-50); color: var(--teal-600); border: 2px solid var(--teal-100); }
+[data-theme="dark"] .gap-4 { background: #251800; border-color: #7a4000; }
+[data-theme="dark"] .gap-3 { background: #1e1900; border-color: #6a5800; }
+.cluster-name { font-family: var(--font-head); font-size: 1rem; margin-bottom: 6px; color: var(--text); }
+.cluster-meta { display: flex; flex-wrap: wrap; gap: 5px; }
+.tag {
+  font-size: 0.63rem; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 2px 8px; border-radius: 20px; border: 1px solid;
+}
+.tag-operational { background: var(--teal-50); color: var(--teal-700); border-color: var(--teal-100); }
+.tag-strategic { background: #f0eafa; color: #5b3d8a; border-color: #d4b8f4; }
+.tag-technical { background: #eaf4fb; color: #1a5f8a; border-color: #b0d8f0; }
+.tag-cultural { background: var(--amber-bg); color: #8a4a10; border-color: var(--amber-lt); }
+.tag-trust { background: var(--red-bg); color: var(--red); border-color: var(--red-lt); }
+.tag-time-resource { background: var(--green-bg); color: var(--green); border-color: var(--green-lt); }
+[data-theme="dark"] .tag-strategic { background: #1a1030; border-color: #3a2060; color: #c090f0; }
+[data-theme="dark"] .tag-technical { background: #0d2030; border-color: #1a4060; color: #80c0f0; }
+.cluster-body { padding: 0 22px 22px; display: none; }
+.cluster-card.open .cluster-body { display: block; }
+.cluster-toggle { margin-left: auto; font-size: 1.1rem; color: var(--text-3); transition: transform 0.2s; flex-shrink: 0; line-height: 1; padding-top: 2px; }
+.cluster-card.open .cluster-toggle { transform: rotate(180deg); }
+.cluster-summary { font-size: 0.86rem; color: var(--text-2); margin-bottom: 16px; line-height: 1.7; }
+.quote-inline {
+  background: var(--surface2);
+  border-left: 3px solid var(--teal-500);
+  padding: 12px 14px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin-bottom: 10px;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.6;
+}
+.quote-source { font-size: 0.68rem; color: var(--text-3); font-style: normal; margin-top: 4px; }
+.gap-bar-wrap { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+.gap-bar-label { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-3); margin-bottom: 6px; gap: 8px; }
+.gap-bar-label span { flex: 1; }
+.gap-bar-track { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.gap-bar-fill { height: 100%; border-radius: 3px; background: var(--red); transition: width 1.2s ease; }
+
+/* ============================================================
+   MENTAL MODEL MAP
+   ============================================================ */
+.models-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 20px;
+}
+.model-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 26px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.model-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--teal-600);
+}
+.model-card.amber-accent::before { background: var(--amber); }
+.model-rank {
+  font-family: var(--font-head);
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--surface2);
+  position: absolute;
+  top: 10px; right: 18px;
+  line-height: 1;
+}
+.model-icon { font-size: 1.6rem; margin-bottom: 10px; }
+.model-name { font-family: var(--font-head); font-size: 1.1rem; margin-bottom: 6px; color: var(--text); }
+.model-groups { font-size: 0.7rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+.model-desc { font-size: 0.83rem; color: var(--text-2); line-height: 1.6; margin-bottom: 14px; }
+.model-quote {
+  font-size: 0.78rem; font-style: italic; color: var(--text);
+  background: var(--surface2); padding: 10px 13px; border-radius: var(--radius);
+  border-left: 2px solid var(--teal-300); line-height: 1.5;
+}
+.model-prevalence { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+.prevalence-dots { display: flex; gap: 4px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--surface2); }
+.dot.filled { background: var(--teal-600); }
+.dot.amber { background: var(--amber); }
+.prevalence-label { font-size: 0.68rem; color: var(--text-3); }
+
+/* ============================================================
+   BREAKTHROUGH MOMENTS
+   ============================================================ */
+.breakthroughs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+.breakthrough-card {
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-lt);
+  border-radius: var(--radius-lg);
+  padding: 26px;
+}
+[data-theme="dark"] .breakthrough-card { background: #2a1d0f; border-color: #6a4020; }
+.bt-marker {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.63rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 14px;
+  background: rgba(200,121,65,0.15);
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(200,121,65,0.3);
+}
+.bt-group { font-size: 0.7rem; color: var(--amber); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.bt-quote {
+  font-family: var(--font-head);
+  font-size: 0.97rem;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+.bt-why {
+  font-size: 0.81rem;
+  color: var(--text-2);
+  line-height: 1.65;
+  padding-top: 14px;
+  border-top: 1px solid rgba(200,121,65,0.2);
+}
+.bt-why strong { color: var(--amber); font-weight: 600; }
+
+/* ============================================================
+   QUOTES WALL
+   ============================================================ */
+.quotes-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+.filter-btn {
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
+  text-transform: uppercase; padding: 5px 13px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text-2); cursor: pointer; transition: all 0.2s;
+  font-family: var(--font-body);
+}
+.filter-btn:hover { border-color: var(--teal-500); color: var(--teal-600); }
+.filter-btn.active { background: var(--teal-700); color: #fff; border-color: var(--teal-700); }
+.quotes-masonry {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 14px;
+}
+.quote-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow);
+  transition: opacity 0.3s;
+}
+.quote-card.hidden { display: none; }
+.quote-lens-tag {
+  font-size: 0.63rem; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 2px 9px; border-radius: 20px;
+  margin-bottom: 12px; display: inline-block; border: 1px solid;
+}
+.lens-TOOL_THINKING { background: #e8f4fa; color: #1a5f8a; border-color: #b0d8f0; }
+.lens-FEAR_BASED { background: var(--red-bg); color: var(--red); border-color: var(--red-lt); }
+.lens-WORKFLOW_STUCK { background: #f0eafa; color: #5b3d8a; border-color: #d4b8f4; }
+.lens-SURFACE_USE { background: var(--surface2); color: var(--text-2); border-color: var(--border); }
+.lens-POTENTIAL_UNLOCKED { background: var(--amber-bg); color: #8a4a10; border-color: var(--amber-lt); }
+.lens-SYSTEMIC_BLIND_SPOT { background: #fff3e8; color: #7a4000; border-color: #f4c090; }
+.lens-AGENCY_LANGUAGE { background: var(--green-bg); color: var(--green); border-color: var(--green-lt); }
+[data-theme="dark"] .lens-TOOL_THINKING { background: #0d2030; border-color: #1a4060; }
+[data-theme="dark"] .lens-FEAR_BASED { background: #2a0f0f; border-color: #5a2020; }
+[data-theme="dark"] .lens-WORKFLOW_STUCK { background: #1a1030; border-color: #3a2060; }
+[data-theme="dark"] .lens-POTENTIAL_UNLOCKED { background: #2a1d0f; border-color: #6a4020; }
+[data-theme="dark"] .lens-SYSTEMIC_BLIND_SPOT { background: #251500; border-color: #5a3000; }
+[data-theme="dark"] .lens-SURFACE_USE { background: var(--surface2); }
+[data-theme="dark"] .lens-AGENCY_LANGUAGE { background: #0f2219; border-color: #1a4030; }
+.quote-text {
+  font-family: var(--font-head);
+  font-size: 0.93rem; font-style: italic;
+  line-height: 1.65; color: var(--text); margin-bottom: 12px;
+}
+.quote-attribution { font-size: 0.7rem; color: var(--text-3); display: flex; align-items: center; gap: 7px; }
+.quote-group-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal-500); flex-shrink: 0; }
+
+/* ============================================================
+   FACILITATOR RECOMMENDATIONS
+   ============================================================ */
+.recs-list { display: flex; flex-direction: column; gap: 20px; }
+.rec-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: 56px 1fr 1fr 1fr;
+}
+@media (max-width: 860px) { .rec-card { grid-template-columns: 1fr; } }
+.rec-num {
+  background: var(--teal-700);
+  color: #fff;
+  font-family: var(--font-head);
+  font-size: 1.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 12px;
+}
+@media (max-width: 860px) { .rec-num { padding: 14px 20px; justify-content: flex-start; font-size: 1.5rem; } }
+.rec-section { padding: 22px; border-left: 1px solid var(--border); }
+@media (max-width: 860px) { .rec-section { border-left: none; border-top: 1px solid var(--border); } }
+.rec-section-label {
+  font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 8px; color: var(--text-3);
+}
+.rec-section-label.pattern { color: var(--red); }
+.rec-section-label.shift { color: var(--teal-600); }
+.rec-section-label.exercise { color: var(--amber); }
+.rec-text { font-size: 0.86rem; color: var(--text); line-height: 1.68; }
+.rec-text em { font-style: italic; }
+.rec-text strong { font-weight: 600; }
+
+/* ============================================================
+   VOCABULARY FINGERPRINT
+   ============================================================ */
+.vocab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+}
+.vocab-column { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); }
+.vocab-column-head { padding: 13px 17px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; }
+.vocab-agency .vocab-column-head { background: var(--green); }
+.vocab-passive .vocab-column-head { background: var(--teal-600); }
+.vocab-threat .vocab-column-head { background: var(--red); }
+.vocab-empower .vocab-column-head { background: var(--amber); }
+.vocab-words { padding: 13px 17px; display: flex; flex-direction: column; gap: 6px; }
+.vocab-word { font-size: 0.8rem; color: var(--text); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.vocab-freq { font-size: 0.63rem; color: var(--text-3); margin-left: auto; background: var(--surface2); padding: 1px 6px; border-radius: 10px; flex-shrink: 0; }
+
+/* ============================================================
+   GROUP FILTER ROW
+   ============================================================ */
+.group-filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+.gfbtn {
+  font-size: 0.7rem; font-weight: 600; padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text-2); cursor: pointer; font-family: var(--font-body); transition: all 0.2s;
+}
+.gfbtn:hover { border-color: var(--teal-500); color: var(--teal-600); }
+.gfbtn.active { background: var(--teal-700); color: #fff; border-color: var(--teal-700); }
+
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+@media print {
+  .nav, .filter-bar, .quotes-filters, .group-filter-row,
+  .nav-controls { display: none !important; }
+  .cluster-body { display: block !important; }
+  .section { padding: 32px 0; page-break-inside: avoid; }
+  body { background: #fff; color: #000; }
+  .hero { background: #0a3f4a; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* ============================================================
+   INSIGHT BOX
+   ============================================================ */
+.insight-box {
+  margin-top: 32px;
+  padding: 22px 26px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+.insight-box h3 { font-family: var(--font-head); font-size: 1.05rem; margin-bottom: 10px; color: var(--text); }
+.insight-box p { font-size: 0.86rem; color: var(--text-2); line-height: 1.75; }
+.insight-box strong { color: var(--text); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     STICKY NAVIGATION
+     ============================================================ -->
+<nav class="nav" role="navigation" aria-label="Dashboard navigation">
+  <div class="nav-inner">
+    <span class="nav-brand">Erasmus+ AI Workshop</span>
+    <button class="nav-link active" onclick="navScrollTo('overview', this)">Overview</button>
+    <button class="nav-link" onclick="navScrollTo('lens', this)">Cognitive Lens</button>
+    <button class="nav-link" onclick="navScrollTo('clusters', this)">Pain Clusters</button>
+    <button class="nav-link" onclick="navScrollTo('models', this)">Mental Models</button>
+    <button class="nav-link" onclick="navScrollTo('breakthroughs', this)">Breakthroughs</button>
+    <button class="nav-link" onclick="navScrollTo('quotes', this)">Quotes</button>
+    <button class="nav-link" onclick="navScrollTo('recs', this)">Recommendations</button>
+    <button class="nav-link" onclick="navScrollTo('vocab', this)">Vocabulary</button>
+    <div class="nav-spacer"></div>
+    <div class="nav-controls">
+      <button class="btn-toggle" id="themeBtn" onclick="toggleTheme()">Dark mode</button>
+      <button class="btn-print" onclick="window.print()">Print</button>
+    </div>
+  </div>
+</nav>
+
+<div class="filter-bar" id="filterBar">
+  <span>Filtered by:</span>
+  <span id="filterTags"></span>
+  <button style="cursor:pointer;color:rgba(255,255,255,0.6);font-size:0.8rem;background:none;border:none;color:var(--teal-300);cursor:pointer;font-family:var(--font-body);" onclick="clearAllFilters()">Clear all</button>
+</div>
+
+<!-- ============================================================
+     HERO / OVERVIEW
+     ============================================================ -->
+<section id="overview" class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">April 15, 2025 &middot; University of Akureyri &middot; Erasmus+ Teaching Mobility Seminar</p>
+    <h1 class="hero-title">AI Workshop &mdash; Cognitive Landscape Report</h1>
+    <p class="hero-sub">7 group discussions &middot; 35+ participants across 6 countries &middot; Thematic analysis through the cognitive shift lens</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num">7</div>
+        <div class="stat-label">Groups</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">28</div>
+        <div class="stat-label">Pain Points</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">7</div>
+        <div class="stat-label">Breakthroughs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">6</div>
+        <div class="stat-label">Mental Models</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">3.7</div>
+        <div class="stat-label">Avg Gap Score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">72%</div>
+        <div class="stat-label">Tool-Oriented</div>
+      </div>
+    </div>
+
+    <div class="verdict-panel">
+      <p class="verdict-label">Cognitive Shift Readiness &mdash; Spectrum Verdict</p>
+      <h2 class="verdict-title">Early Stage: Primarily Tool-Oriented with Isolated Moments of Genuine Reframing</h2>
+      <div class="spectrum-track">
+        <div class="spectrum-fill">
+          <div class="spectrum-marker"></div>
+        </div>
+      </div>
+      <div class="spectrum-labels">
+        <span>Tool Use Only</span>
+        <span>Emerging Shift</span>
+        <span>Thinking With AI</span>
+      </div>
+      <p class="verdict-desc">
+        Across all 7 groups, participants consistently framed AI as a software tool to reduce workload &mdash; automating existing tasks rather than redesigning the cognitive work itself. The dominant concern was operational friction: paperwork overload, fragmented information, assessment inconsistency, and inadequate policy. Breakthrough moments appeared in Groups 1, 3, 4, and 7, where participants momentarily stepped outside tool-framing to articulate systemic redesign or collaborative reasoning. The prevailing mental models &mdash; Efficiency Tool, Search Engine, Unreliable Employee &mdash; reveal a room that has adopted AI into current workflows rather than allowing AI to challenge those workflows. The gap between where participants are and where thinking-with-AI begins averages 3.7 out of 5. The most significant finding in the vocabulary audit: <em>no participant used the phrases "thinking with AI," "reasoning together," or "collaborative intelligence"</em> &mdash; precisely the concepts this workshop aims to catalyse.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     COGNITIVE LENS BREAKDOWN
+     ============================================================ -->
+<section id="lens" class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Section 02</span>
+      <h2 class="section-title">Cognitive Lens Breakdown</h2>
+      <p class="section-sub">Every pain point classified by how participants relate to AI. Click a lens card to filter the Quotes Wall below.</p>
+    </div>
+
+    <div class="lens-layout">
+      <div class="chart-wrap">
+        <canvas id="lensChart" aria-label="Cognitive lens distribution donut chart" role="img"></canvas>
+        <div class="chart-center-label">
+          <div class="big">28</div>
+          <div class="small">pain points</div>
+        </div>
+        <div class="chart-fallback" id="lensChartFallback">
+          Chart unavailable. Data: Tool Thinking 10 &middot; Workflow Stuck 6 &middot; Fear Based 5 &middot; Systemic Blind Spot 3 &middot; Potential Unlocked 3 &middot; Surface Use 3
+        </div>
+      </div>
+
+      <div class="lens-legend" id="lensLegend">
+        <div class="lens-item" data-lens="TOOL_THINKING" onclick="filterByLens('TOOL_THINKING')">
+          <div class="lens-dot" style="background:#1a7fa8"></div>
+          <div>
+            <div class="lens-name">TOOL_THINKING</div>
+            <div class="lens-desc">AI described as a thing that does tasks. "Feed it, get output." Prevalent across all groups.</div>
+          </div>
+          <div class="lens-count">10</div>
+        </div>
+        <div class="lens-item" data-lens="WORKFLOW_STUCK" onclick="filterByLens('WORKFLOW_STUCK')">
+          <div class="lens-dot" style="background:#7b52c8"></div>
+          <div>
+            <div class="lens-name">WORKFLOW_STUCK</div>
+            <div class="lens-desc">Fitting AI into existing processes rather than redesigning them from first principles.</div>
+          </div>
+          <div class="lens-count">6</div>
+        </div>
+        <div class="lens-item" data-lens="FEAR_BASED" onclick="filterByLens('FEAR_BASED')">
+          <div class="lens-dot" style="background:#b03a3a"></div>
+          <div>
+            <div class="lens-name">FEAR_BASED</div>
+            <div class="lens-desc">Resistance from uncertainty, loss of control, copyright anxiety, or data protection as shield.</div>
+          </div>
+          <div class="lens-count">5</div>
+        </div>
+        <div class="lens-item" data-lens="SYSTEMIC_BLIND_SPOT" onclick="filterByLens('SYSTEMIC_BLIND_SPOT')">
+          <div class="lens-dot" style="background:#c87941"></div>
+          <div>
+            <div class="lens-name">SYSTEMIC_BLIND_SPOT</div>
+            <div class="lens-desc">Sees the symptom clearly, cannot articulate the structural cause generating it.</div>
+          </div>
+          <div class="lens-count">3</div>
+        </div>
+        <div class="lens-item" data-lens="POTENTIAL_UNLOCKED" onclick="filterByLens('POTENTIAL_UNLOCKED')">
+          <div class="lens-dot" style="background:#2e7d5a"></div>
+          <div>
+            <div class="lens-name">POTENTIAL_UNLOCKED</div>
+            <div class="lens-desc">Close to thinking-with-AI but hasn't named the frame yet. Breakthrough moments cluster here.</div>
+          </div>
+          <div class="lens-count">3</div>
+        </div>
+        <div class="lens-item" data-lens="SURFACE_USE" onclick="filterByLens('SURFACE_USE')">
+          <div class="lens-dot" style="background:#8a9aaa"></div>
+          <div>
+            <div class="lens-name">SURFACE_USE</div>
+            <div class="lens-desc">Shallow applications only: inspiration-seeking, summarising, formatting. No iteration.</div>
+          </div>
+          <div class="lens-count">3</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PAIN POINT CLUSTERS
+     ============================================================ -->
+<section id="clusters" class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Section 03</span>
+      <h2 class="section-title">Pain Point Cluster Cards</h2>
+      <p class="section-sub">Sorted by Gap Score: how deeply entrenched is tool-thinking for this cluster? (5 = most entrenched, 1 = nearly thinking-with-AI already). Click any card to expand verbatim quotes.</p>
+    </div>
+
+    <div class="group-filter-row" id="clusterGroupFilter">
+      <button class="gfbtn active" onclick="filterClusters('all', this)">All Groups</button>
+      <button class="gfbtn" onclick="filterClusters('G1', this)">Group 1</button>
+      <button class="gfbtn" onclick="filterClusters('G2', this)">Group 2</button>
+      <button class="gfbtn" onclick="filterClusters('G3', this)">Group 3</button>
+      <button class="gfbtn" onclick="filterClusters('G4', this)">Group 4</button>
+      <button class="gfbtn" onclick="filterClusters('G5', this)">Group 5</button>
+      <button class="gfbtn" onclick="filterClusters('G6', this)">Group 6</button>
+      <button class="gfbtn" onclick="filterClusters('G7', this)">Group 7</button>
+    </div>
+
+    <div class="clusters-grid" id="clustersGrid">
+
+      <!-- GAP 5: Fragmented Information Silos -->
+      <div class="cluster-card" data-groups="G1 G3 G5" data-gap="5">
+        <div class="cluster-head" onclick="toggleCluster(this)">
+          <div class="gap-badge gap-5" title="Gap Score 5 — most entrenched tool-thinking">5</div>
+          <div style="flex:1;min-width:0;">
+            <div class="cluster-name">Fragmented Information Silos</div>
+            <div class="cluster-meta">
+              <span class="tag tag-operational">Operational</span>
+              <span class="tag tag-strategic">Strategic</span>
+            </div>
+          </div>
+          <div class="cluster-toggle">&#9660;</div>
+        </div>
+        <div class="cluster-body">
+          <p class="cluster-summary">Groups 1, 3, and 5 all describe the same structural failure: critical information lives in disconnected platforms, PDFs, and websites managed by different people with no authoritative source. Participants frame this as a coordination burden, not a knowledge architecture problem. AI is imagined as an aggregator, not a redesigner.</p>
+          <div class="quote-inline">
+            "I manage my website. The university is managing its website. I also managed the educational platforms &mdash; and imagine the same information posted five different places managed by three other different people, and you don't know exactly if the information is correct in all the sources."
+            <div class="quote-source">&mdash; Group 1, Speaker 3</div>
+          </div>
+          <div class="quote-inline">
+            "Every department has their own PDFs. They might not be centralized together, and then a student might come to you and say, hey, I have like 60% of attendance &mdash; can I still pass the course?"
+            <div class="quote-source">&mdash; Group 3, Speaker 2</div>
+          </div>
+          <div class="gap-bar-wrap">
+            <div class="gap-bar-label">
+              <span>Tool solution: AI chatbot aggregating PDFs</span>
+              <span>Thinking-with-AI: Redesign knowledge architecture</span>
+            </div>
+            <div class="gap-bar-track"><div class="gap-bar-fill" data-target="100" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAP 5: Ethics as Shield -->
+      <div class="cluster-card" data-groups="G1 G2" data-gap="5">
+        <div class="cluster-head" onclick="toggleCluster(this)">
+          <div class="gap-badge gap-5">5</div>
+          <div style="flex:1;min-width:0;">
+            <div class="cluster-name">Ethics &amp; Data Protection as Avoidance Shield</div>
+            <div class="cluster-meta">
+              <span class="tag tag-cultural">Cultural</span>
+              <span class="tag tag-trust">Trust</span>
+            </div>
+          </div>
+          <div class="cluster-toggle">&#9660;</div>
+        </div>
+        <div class="cluster-body">
+          <p class="cluster-summary">Ethics, GDPR, and copyright are invoked as conversation-stoppers rather than as analytical frameworks. The discourse substitutes vocabulary for engagement. Notably, the same participants who invoke data protection vigorously click through terms and conditions without reading them.</p>
+          <div class="quote-inline">
+            "We have to be very ethical about implementing AI. I'm not gonna learn about AI, but I know about ethics &mdash; same with critical thinking. So it becomes a protection mechanism."
+            <div class="quote-source">&mdash; Group 2, Speaker 1 (diagnosing a pattern they also participate in)</div>
+          </div>
+          <div class="quote-inline">
+            "People that don't have a basic understanding of what data protection is? All of a sudden, like it becomes a very, very important topic. But when they hit the next Terms and Conditions on installing an app, they just hit accept to continue."
+            <div class="quote-source">&mdash; Group 2, Speaker 1</div>
+          </div>
+          <div class="gap-bar-wrap">
+            <div class="gap-bar-label">
+              <span>Tool solution: Add compliance layer, avoid risk</span>
+              <span>Thinking-with-AI: Use AI to navigate ethical reasoning</span>
+            </div>
+            <div class="gap-bar-track"><div class="gap-bar-fill" data-target="100" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAP 4: Assessment Integrity Paradox -->
+      <div class="cluster-card" data-groups="G4 G5" data-gap="4">
+        <div class="cluster-head" onclick="toggleCluster(this)">
+          <div class="gap-badge gap-4">4</div>
+          <div style="flex:1;min-width:0;">
+            <div class="cluster-name">The Assessment Integrity Paradox</div>
+            <div class="cluster-meta">
+              <span class="tag tag-strategic">Strategic</span>
+              <span class="tag tag-operational">Operational</span>
+            </div>
+          </div>
+          <div class="cluster-toggle">&#9660;</div>
+        </div>
+        <div class="cluster-body">
+          <p class="cluster-summary">Multiple groups struggle with the paradox of encouraging AI use in learning while preventing it in formal assessments. The institutional response &mdash; eliminating home exams in favour of supervised school exams &mdash; is correctly identified as a regression, but no group arrives at a redesigned assessment philosophy to replace it.</p>
+          <div class="quote-inline">
+            "The four or five day home exam is a very neat learning process as well &mdash; a learning process that you don't get with just having a school exam. So how to hold on to the good learning processes when you're at the same time checking the student's knowledge?"
+            <div class="quote-source">&mdash; Group 4, Speaker 2</div>
+          </div>
+          <div class="quote-inline">
+            "Every subject has to teach the students to use AI within that subject. They have to learn how to check the information they get from AI. That is training, train, train, train, yes."
+            <div class="quote-source">&mdash; Group 4, Speaker 2</div>
+          </div>
+          <div class="gap-bar-wrap">
+            <div class="gap-bar-label">
+              <span>Tool solution: AI detection tools, revert to supervised exams</span>
+              <span>Thinking-with-AI: Redesign assessment around what only humans can do</span>
+            </div>
+            <div class="gap-bar-track"><div class="gap-bar-fill" data-target="80" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAP 4: Trust Deficit -->
+      <div class="cluster-card" data-groups="G2 G6" data-gap="4">
+        <div class="cluster-head" onclick="toggleCluster(this)">
+          <div class="gap-badge gap-4">4</div>
+          <div style="flex:1;min-width:0;">
+            <div class="cluster-name">Trust Deficit &amp; Reliability Anxiety</div>
+            <div class="cluster-meta">
+              <span class="tag tag-trust">Trust</span>
+              <span class="tag tag-cultural">Cultural</span>
+            </div>
+          </div>
+          <div class="cluster-toggle">&#9660;</div>
+        </div>
+        <div class="cluster-body">
+          <p class="cluster-summary">Participants distrust AI outputs without a conceptual model for when trust is warranted. The Group 6 failure (mismatched function/data types from ChatGPT) is experienced as evidence AI "doesn't work" rather than as a prompt calibration problem the user can address through iteration.</p>
+          <div class="quote-inline">
+            "I don't trust it at all. I wonder where it gets the data from, where it's learned &mdash; and then what it tells me, I don't know."
+            <div class="quote-source">&mdash; Group 2, Speaker 3 (creative communications professional)</div>
+          </div>
+          <div class="quote-inline">
+            "He gave me the formula, and I asked him okay give me the data &mdash; because I want to give the data to my students &mdash; and when he gave me the data, this not worked. The data could be from a linear function and the formula is from a square function. Completely different."
+            <div class="quote-source">&mdash; Group 6, Speaker 3 (logistics professor)</div>
+          </div>
+          <div class="gap-bar-wrap">
+            <div class="gap-bar-label">
+              <span>Tool solution: Verify every output manually or avoid AI</span>
+              <span>Thinking-with-AI: Learn to calibrate trust contextually through iteration</span>
+            </div>
+            <div class="gap-bar-track"><div class="gap-bar-fill" data-target="80" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAP 4: Resource Scarcity -->
+      <div class="cluster-card" data-groups="G1 G2 G3" data-gap="4">
+        <div class="cluster-head" onclick="toggleCluster(this)">
+          <div class="gap-badge gap-4">4</div>
+          <div style="flex:1;min-width:0;">
+            <div class="cluster-name">Resource Scarcity &amp; Capacity Overwhelm</div>
+            <div class="cluster-meta">
+              <span class="tag tag-time-resource">Time/Resource</span>
+              <span class="tag tag-operational">Operational</span>
+            </div>
+          </div>
+          <div class="cluster-toggle">&#9660;</div>
+        </div>
+        <div class="cluster-body">
+          <p class="cluster-summary">Small teams managing disproportionate administrative loads. AI is positioned as a pressure-relief valve for existing overload rather than a lever for structural redesign. The mental model is efficiency, not reimagination. Hiring more AI specialists is proposed as a solution &mdash; recreating human bottlenecks at scale.</p>
+          <div class="quote-inline">
+            "We have a 60,000 student university and two AI specialists. That guy who is working with AI development is overwhelmed by different requests from different faculties."
+            <div class="quote-source">&mdash; Group 2, Speaker 2</div>
+          </div>
+          <div class="quote-inline">
+            "In my faculty we are only three people &mdash; me, my colleague, and another colleague. And my university has 18 faculties with more than 26 hundred students enrolled."
+            <div class="quote-source">&mdash; Group 1, Speaker 2</div>
+          </div>
+          <div class="gap-bar-wrap">
+            <div class="gap-bar-label">
+              <span>Tool solution: Automate bottlenecks, hire AI staff</span>
+              <span>Thinking-with-AI: Redesign knowledge flows so individuals are not bottlenecks</span>
+            </div>
+            <div class="gap-bar-track"><div class="gap-bar-fill" data-target="80" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAP 3: AI as Labour-Saving Device -->
+      <div class="cluster-card" data-groups="G5 G3" data-gap="3">
+        <div class="cluster-head" onclick="toggleCluster(this)">
+          <div class="gap-badge gap-3">3</div>
+          <div style="flex:1;min-width:0;">
+            <div class="cluster-name">AI as Labour-Saving Device in Teaching</div>
+            <div class="cluster-meta">
+              <span class="tag tag-operational">Operational</span>
+              <span class="tag tag-time-resource">Time/Resource</span>
+            </div>
+          </div>
+          <div class="cluster-toggle">&#9660;</div>
+        </div>
+        <div class="cluster-body">
+          <p class="cluster-summary">Faculty primarily envision AI for course content automation: updating statistics in slides, generating exam questions, creating learning materials. This is surface use without pedagogical redesign. The assumption is that current course structure is correct and valuable; only the effort of producing it needs reducing.</p>
+          <div class="quote-inline">
+            "Update my slides, our statistics from 2025 &mdash; please update the numbers. My slides and give them all the teaching materials I've uploaded. Please create me an exam. Automatically generate exam questions."
+            <div class="quote-source">&mdash; Group 5, Speaker 2</div>
+          </div>
+          <div class="quote-inline">
+            "I see this tool more from the teaching perspective. I want a tool that allows me to reduce work hours from the human side. Like setting up new courses or creating exams &mdash; this is something where we spend a lot of hours, it could be automated."
+            <div class="quote-source">&mdash; Group 5, Speaker 2</div>
+          </div>
+          <div class="gap-bar-wrap">
+            <div class="gap-bar-label">
+              <span>Tool solution: Automate existing prep tasks</span>
+              <span>Thinking-with-AI: Co-design pedagogy with AI as intellectual partner</span>
+            </div>
+            <div class="gap-bar-track"><div class="gap-bar-fill" data-target="60" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAP 3: Missing AI Policy -->
+      <div class="cluster-card" data-groups="G4 G5" data-gap="3">
+        <div class="cluster-head" onclick="toggleCluster(this)">
+          <div class="gap-badge gap-3">3</div>
+          <div style="flex:1;min-width:0;">
+            <div class="cluster-name">Missing AI Policy Framework</div>
+            <div class="cluster-meta">
+              <span class="tag tag-strategic">Strategic</span>
+              <span class="tag tag-operational">Operational</span>
+            </div>
+          </div>
+          <div class="cluster-toggle">&#9660;</div>
+        </div>
+        <div class="cluster-body">
+          <p class="cluster-summary">Institutions lack coherent AI policies, creating a vacuum that leaves faculty making ad hoc decisions. Participants experience the policy gap as a blocker to action, rather than as an invitation to help shape the institutional response. The dominant posture is to wait for top-down policy.</p>
+          <div class="quote-inline">
+            "How to solve the paradox of encouraging students to use AI, yeah, and for them not to use it for exams or assessments that they're handing in &mdash; it doesn't work and it hasn't."
+            <div class="quote-source">&mdash; Group 4, Speaker 2</div>
+          </div>
+          <div class="quote-inline">
+            "Problems in the AI policies &mdash; the data protection &mdash; and in my case, we have quite good internal resources onto AI development."
+            <div class="quote-source">&mdash; Group 2, Speaker 2</div>
+          </div>
+          <div class="gap-bar-wrap">
+            <div class="gap-bar-label">
+              <span>Tool solution: Wait for top-down policy, add detection tools</span>
+              <span>Thinking-with-AI: Use AI to model policy scenarios and stakeholder impacts</span>
+            </div>
+            <div class="gap-bar-track"><div class="gap-bar-fill" data-target="60" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAP 2: Inconsistent Human Judgement -->
+      <div class="cluster-card" data-groups="G3 G4" data-gap="2">
+        <div class="cluster-head" onclick="toggleCluster(this)">
+          <div class="gap-badge gap-2">2</div>
+          <div style="flex:1;min-width:0;">
+            <div class="cluster-name">Inconsistent Human Judgement in High-Stakes Decisions</div>
+            <div class="cluster-meta">
+              <span class="tag tag-operational">Operational</span>
+              <span class="tag tag-trust">Trust</span>
+            </div>
+          </div>
+          <div class="cluster-toggle">&#9660;</div>
+        </div>
+        <div class="cluster-body">
+          <p class="cluster-summary">Admissions and assessment staff openly acknowledge their own cognitive inconsistency &mdash; decisions vary by who makes them, what time of day, how tired they are. This is a near-breakthrough: participants correctly name a problem AI could structurally address, but don't connect to a redesigned decision architecture. Gap Score 2 because the problem is correctly framed.</p>
+          <div class="quote-inline">
+            "The decision will differ depending on who checks it. Because it's a kind of huge responsibility to make those decisions."
+            <div class="quote-source">&mdash; Group 3, Speaker 3 (Admissions &amp; Exchange Officer)</div>
+          </div>
+          <div class="quote-inline">
+            "Students that you evaluate after you come from lunch &mdash; they get a very thorough assessment. But when you're depending on your day or your week, it's affecting your work. Yeah, it's &mdash; you're human."
+            <div class="quote-source">&mdash; Group 3, Speaker 1</div>
+          </div>
+          <div class="gap-bar-wrap">
+            <div class="gap-bar-label">
+              <span>Tool solution: Use AI to screen and flag edge cases</span>
+              <span>Thinking-with-AI: Design AI as consistency scaffold in a redesigned process</span>
+            </div>
+            <div class="gap-bar-track"><div class="gap-bar-fill" data-target="40" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAP 2: Agentic AI Security -->
+      <div class="cluster-card" data-groups="G7" data-gap="2">
+        <div class="cluster-head" onclick="toggleCluster(this)">
+          <div class="gap-badge gap-2">2</div>
+          <div style="flex:1;min-width:0;">
+            <div class="cluster-name">Security &amp; Control of Agentic AI Tools</div>
+            <div class="cluster-meta">
+              <span class="tag tag-technical">Technical</span>
+              <span class="tag tag-trust">Trust</span>
+            </div>
+          </div>
+          <div class="cluster-toggle">&#9660;</div>
+        </div>
+        <div class="cluster-body">
+          <p class="cluster-summary">Group 7's discussion of autonomous AI tools shows the most technically sophisticated framing in the room. They grasp authority delegation, guardrails, and oversight design &mdash; concepts that are prerequisites for genuine thinking-with-AI. The remaining gap is the claim that this requires a "developer mindset" that others cannot attain.</p>
+          <div class="quote-inline">
+            "If you just install open claw and set it loose, you basically just give it free reign on your computer, and it can go on the internet and do stuff on your behalf. Which, if you know how to guard it and put a guardrail for it, it's immensely powerful."
+            <div class="quote-source">&mdash; Group 7, Speaker 1</div>
+          </div>
+          <div class="quote-inline">
+            "Open Claw is like an end game boss &mdash; you have to be able to go through until you've gained an understanding. And what did I tell you before? Learn &mdash; go from where you are from your understanding of AI."
+            <div class="quote-source">&mdash; Group 7, Speaker 1</div>
+          </div>
+          <div class="gap-bar-wrap">
+            <div class="gap-bar-label">
+              <span>Tool solution: Avoid agentic tools, stick to safe prompting</span>
+              <span>Thinking-with-AI: Design authority boundaries and oversight loops deliberately</span>
+            </div>
+            <div class="gap-bar-track"><div class="gap-bar-fill" data-target="40" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MENTAL MODEL MAP
+     ============================================================ -->
+<section id="models" class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Section 04</span>
+      <h2 class="section-title">Mental Model Map</h2>
+      <p class="section-sub">The dominant metaphor each group uses to conceptualise AI. These models determine which questions they think to ask &mdash; and which they never consider. Ranked by prevalence across all groups.</p>
+    </div>
+
+    <div class="models-grid">
+
+      <div class="model-card">
+        <div class="model-rank">01</div>
+        <div class="model-icon">&#9881;&#65039;</div>
+        <h3 class="model-name">The Efficiency Tool Model</h3>
+        <p class="model-groups">Groups 1, 3, 5 &middot; Prevalence: Dominant</p>
+        <p class="model-desc">AI is a productivity instrument that reduces hours on existing tasks. The job description doesn't change; the time it takes does. Innovation is measured in hours saved, not cognitive capability gained. Current workflows are assumed to be correct.</p>
+        <div class="model-quote">"I see this tool more from the teaching perspective &mdash; I want a tool that allows me to reduce work hours from the human side."</div>
+        <div class="model-prevalence">
+          <div class="prevalence-dots">
+            <div class="dot filled"></div><div class="dot filled"></div>
+            <div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div>
+          </div>
+          <span class="prevalence-label">Dominant &mdash; present in 5 of 7 groups</span>
+        </div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-rank">02</div>
+        <div class="model-icon">&#128269;</div>
+        <h3 class="model-name">The Search Engine Model</h3>
+        <p class="model-groups">Groups 1, 2, 3 &middot; Prevalence: High</p>
+        <p class="model-desc">AI is an advanced search and retrieval system. You query it, it returns information. The assumption is that answers already exist somewhere and AI finds them. This forecloses the possibility that AI can help construct genuinely new understanding.</p>
+        <div class="model-quote">"I wonder where it gets the data from, where it's learned &mdash; and then what it tells me, I don't know."</div>
+        <div class="model-prevalence">
+          <div class="prevalence-dots">
+            <div class="dot filled"></div><div class="dot filled"></div>
+            <div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div>
+          </div>
+          <span class="prevalence-label">High &mdash; 4 of 7 groups</span>
+        </div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-rank">03</div>
+        <div class="model-icon">&#128577;</div>
+        <h3 class="model-name">The Unreliable Employee Model</h3>
+        <p class="model-groups">Groups 2, 6 &middot; Prevalence: Medium-High</p>
+        <p class="model-desc">AI is a junior staff member who sometimes makes plausible-sounding mistakes. Interaction is supervisory rather than collaborative. Trust is binary: you trust it enough to deploy it, or you don't use it. There is no concept of calibrated trust.</p>
+        <div class="model-quote">"The data could be from a linear function and the formula is from a square function &mdash; completely different. Do you come from a computer science background? Because he gave me the answer, but wrong."</div>
+        <div class="model-prevalence">
+          <div class="prevalence-dots">
+            <div class="dot filled"></div><div class="dot filled"></div>
+            <div class="dot filled"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+          <span class="prevalence-label">Medium-High &mdash; 3 of 7 groups</span>
+        </div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-rank">04</div>
+        <div class="model-icon">&#128737;&#65039;</div>
+        <h3 class="model-name">The Threat to be Governed Model</h3>
+        <p class="model-groups">Groups 2, 4 &middot; Prevalence: Medium</p>
+        <p class="model-desc">AI is primarily a risk to be managed: copyright, data exposure, academic dishonesty, job displacement. All strategic questions about AI become governance questions. "What do we do with AI?" becomes "How do we contain AI?" Policy replaces strategy.</p>
+        <div class="model-quote">"We have to be very ethical about implementing AI. I'm not gonna learn about AI, but I know about ethics."</div>
+        <div class="model-prevalence">
+          <div class="prevalence-dots">
+            <div class="dot filled"></div><div class="dot filled"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+          <span class="prevalence-label">Medium &mdash; 2 of 7 groups (but language appears in 5)</span>
+        </div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-rank">05</div>
+        <div class="model-icon">&#127929;</div>
+        <h3 class="model-name">The Vending Machine Model</h3>
+        <p class="model-groups">Groups 5, 6 &middot; Prevalence: Medium</p>
+        <p class="model-desc">Insert a specific request; receive a specific output. When the output is wrong, the machine is broken. There is no concept of iterative dialogue, constraint-setting, or framing as part of the process. Single-shot prompting is the only mode of interaction.</p>
+        <div class="model-quote">"When I asked ChatGPT give me the data &mdash; because I want to give the data to my students &mdash; when he gave me the data, this not worked."</div>
+        <div class="model-prevalence">
+          <div class="prevalence-dots">
+            <div class="dot filled"></div><div class="dot filled"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+          <span class="prevalence-label">Medium &mdash; 2 of 7 groups</span>
+        </div>
+      </div>
+
+      <div class="model-card amber-accent">
+        <div class="model-rank" style="color:rgba(200,121,65,0.15);">06</div>
+        <div class="model-icon">&#127758;</div>
+        <h3 class="model-name">The Autonomous Agent Model</h3>
+        <p class="model-groups">Group 7 &middot; Prevalence: Low &mdash; but most sophisticated</p>
+        <p class="model-desc">AI is a semi-autonomous actor with authority that must be scoped and deliberately governed. This model implies understanding of delegation, oversight loops, and the need to design the human-AI boundary. It is the only model in the room that naturally leads to thinking-with-AI.</p>
+        <div class="model-quote">"You have to understand how it's working with your data and how the authority you give it &mdash; if you know how to guard it and put a guardrail for it, it's immensely powerful."</div>
+        <div class="model-prevalence">
+          <div class="prevalence-dots">
+            <div class="dot amber"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+          <span class="prevalence-label">1 of 7 groups &mdash; highest cognitive sophistication</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     BREAKTHROUGH MOMENTS
+     ============================================================ -->
+<section id="breakthroughs" class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Section 05</span>
+      <h2 class="section-title">Breakthrough Moments</h2>
+      <p class="section-sub">Where participants stepped outside the tool frame &mdash; moments of reframing, systems thinking, or genuine reasoning WITH AI rather than delegation TO it. These are the facilitation opportunities.</p>
+    </div>
+
+    <div class="breakthroughs-grid">
+
+      <div class="breakthrough-card">
+        <div class="bt-marker">&#10022; Epistemic Reframing</div>
+        <div class="bt-group">Group 1 &mdash; Complexity Paralysis</div>
+        <div class="bt-quote">"If you have a clearly defined problem, and if you have a clearly defined what success looks like, AI is very, very useful in filling in between. However, if your problem is poorly developed and what success looks like is too vague&hellip;"</div>
+        <div class="bt-why"><strong>Why it matters:</strong> This speaker articulates the foundational condition for effective AI collaboration &mdash; problem clarity before tool deployment. This is not tool-thinking; it is describing the epistemic prerequisite for thinking-with-AI. The facilitator could have named and amplified this as the frame for the entire workshop.</div>
+      </div>
+
+      <div class="breakthrough-card">
+        <div class="bt-marker">&#10022; Institutional Diagnosis</div>
+        <div class="bt-group">Group 2 &mdash; Ethics as Avoidance</div>
+        <div class="bt-quote">"I have researched and I've found a very clear pattern &mdash; it is a protection mechanism. 'We have to be very ethical about implementing AI. I'm not gonna learn about AI, but I know about ethics&hellip;'"</div>
+        <div class="bt-why"><strong>Why it matters:</strong> The speaker diagnoses the structural function of ethical discourse as displacement activity. This is a rare moment of meta-level institutional analysis &mdash; naming a systemic dynamic that ordinarily goes unspoken. The insight was not generalised to the group.</div>
+      </div>
+
+      <div class="breakthrough-card">
+        <div class="bt-marker">&#10022; Conceptual Invention</div>
+        <div class="bt-group">Group 3 &mdash; Responsibility Architecture</div>
+        <div class="bt-quote">"The danger there &mdash; what I call the responsibility fog and the cognitive depth &mdash; is that you would become a responsibility sponge, that you would incorporate from AI, and instead of evaluating 10 students per day you would do 100."</div>
+        <div class="bt-why"><strong>Why it matters:</strong> The speaker invents original concepts ("responsibility sponge," "responsibility fog") to name a failure mode in human-AI teaming. This is genuine conceptual work creating language for a risk that has no standard term. It demonstrates thinking about the human-AI system rather than just the tool output.</div>
+      </div>
+
+      <div class="breakthrough-card">
+        <div class="bt-marker">&#10022; Pedagogical Reframe</div>
+        <div class="bt-group">Group 4 &mdash; Assessment as Safety Filter</div>
+        <div class="bt-quote">"No &mdash; they said, you're just checking if you are dangerous. So: what does danger look like in your fields? Figure out what is dangerous, and then figure out how are we going to avoid persons getting through our programs with dangerous [knowledge gaps]."</div>
+        <div class="bt-why"><strong>Why it matters:</strong> The First Responder training analogy reframes assessment entirely &mdash; from performance measurement to safety verification. This is the most generative reframe across all 7 transcripts. If adopted, it fundamentally changes how AI's role in education should be conceptualised and designed.</div>
+      </div>
+
+      <div class="breakthrough-card">
+        <div class="bt-marker">&#10022; Historical Systems View</div>
+        <div class="bt-group">Group 4 &mdash; Institutional Evolution</div>
+        <div class="bt-quote">"Universities through the centuries have changed. Yes, it's been fluid, and now we're just being called upon to do it faster. Yeah, and the problem is that&hellip; we don't want this to become theater."</div>
+        <div class="bt-why"><strong>Why it matters:</strong> This participant steps fully outside the tool frame to articulate a historical-systemic view of institutional change. The challenge is not AI policy but the pace of institutional evolution itself. Crucially, they also warn against superficial compliance &mdash; "we don't want this to become theater."</div>
+      </div>
+
+      <div class="breakthrough-card">
+        <div class="bt-marker">&#10022; Loop Thinking</div>
+        <div class="bt-group">Group 5 &mdash; AI Evaluating AI</div>
+        <div class="bt-quote">"Students you say to solve the problems created by another AI&hellip; you evaluate the exam questions and you create this loop system."</div>
+        <div class="bt-why"><strong>Why it matters:</strong> Though expressed tentatively, this is the closest Group 5 comes to systems thinking &mdash; AI and humans operating in feedback loops rather than linear tool-use. The speaker instinctively designs a recursive evaluation architecture. This insight was not developed; the conversation moved past it.</div>
+      </div>
+
+      <div class="breakthrough-card">
+        <div class="bt-marker">&#10022; Authority Design</div>
+        <div class="bt-group">Group 7 &mdash; Guardrails as Design Problem</div>
+        <div class="bt-quote">"You have to understand how it's working with your data and how the authority you give it&hellip; on the path of using AI, Open Claw is like an end game boss &mdash; you have to be able to go through until you've gained an understanding."</div>
+        <div class="bt-why"><strong>Why it matters:</strong> This speaker conceptualises AI deployment as an authority design problem, not a binary trust question. The "end game boss" framing reveals intuitive understanding of progressive capability development. This is the mental model closest to how serious AI practitioners actually think about system design.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     QUOTES WALL
+     ============================================================ -->
+<section id="quotes" class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Section 06</span>
+      <h2 class="section-title">Quotes Wall</h2>
+      <p class="section-sub">The most revealing verbatim utterances from all 7 groups. STT artefacts preserved intentionally &mdash; the messiness is data. Filter by cognitive lens below.</p>
+    </div>
+
+    <div class="quotes-filters">
+      <button class="filter-btn active" onclick="filterQuotes('all', this)">All</button>
+      <button class="filter-btn" onclick="filterQuotes('TOOL_THINKING', this)">Tool Thinking</button>
+      <button class="filter-btn" onclick="filterQuotes('FEAR_BASED', this)">Fear Based</button>
+      <button class="filter-btn" onclick="filterQuotes('WORKFLOW_STUCK', this)">Workflow Stuck</button>
+      <button class="filter-btn" onclick="filterQuotes('POTENTIAL_UNLOCKED', this)">Potential Unlocked</button>
+      <button class="filter-btn" onclick="filterQuotes('SYSTEMIC_BLIND_SPOT', this)">Systemic Blind Spot</button>
+      <button class="filter-btn" onclick="filterQuotes('SURFACE_USE', this)">Surface Use</button>
+      <button class="filter-btn" onclick="filterQuotes('AGENCY_LANGUAGE', this)">Agency Language</button>
+    </div>
+
+    <div class="quotes-masonry" id="quotesGrid">
+
+      <div class="quote-card" data-lens="SYSTEMIC_BLIND_SPOT" data-group="G1">
+        <span class="quote-lens-tag lens-SYSTEMIC_BLIND_SPOT">Systemic Blind Spot</span>
+        <p class="quote-text">"Everybody has stressful work, and everybody works a lot. But the results aren't effective."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 1 &middot; Speaker 2 &middot; Describes systemic overload without identifying the structural cause</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="WORKFLOW_STUCK" data-group="G1">
+        <span class="quote-lens-tag lens-WORKFLOW_STUCK">Workflow Stuck</span>
+        <p class="quote-text">"The same information posted five different places managed by three other different people, and you don't know exactly if the information is correct in all the sources."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 1 &middot; Speaker 4 &middot; Frames duplication as coordination problem, not architecture problem</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="POTENTIAL_UNLOCKED" data-group="G1">
+        <span class="quote-lens-tag lens-POTENTIAL_UNLOCKED">Potential Unlocked</span>
+        <p class="quote-text">"If you have a clearly defined problem, and if you have a clearly defined what success looks like, AI is very, very useful in filling in between. However, if your problem is poorly developed and what success looks like is too vague&hellip;"</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 1 &middot; Speaker 1 &middot; Names the epistemic prerequisite for effective AI collaboration</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="WORKFLOW_STUCK" data-group="G1">
+        <span class="quote-lens-tag lens-WORKFLOW_STUCK">Workflow Stuck</span>
+        <p class="quote-text">"We repeat the same answers &mdash; for example in the Erasmus Plus project, we have to explain the project to the economic staff, to the Dean's office, and so on, and so on."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 1 &middot; Speaker 2 &middot; Describes communication overhead without questioning the need for it</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="FEAR_BASED" data-group="G2">
+        <span class="quote-lens-tag lens-FEAR_BASED">Fear Based</span>
+        <p class="quote-text">"I don't trust it at all. I wonder where it gets the data from, where it's learned. But then, what it tells me &mdash; I don't know. Data protection, and I'm like, okay."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 2 &middot; Speaker 3 &middot; Creative communications professional &middot; Trust + identity resistance</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="SYSTEMIC_BLIND_SPOT" data-group="G2">
+        <span class="quote-lens-tag lens-SYSTEMIC_BLIND_SPOT">Systemic Blind Spot</span>
+        <p class="quote-text">"It is a protection mechanism. 'We have to be very ethical about implementing AI. I'm not gonna learn about AI, but I know about ethics&hellip;'"</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 2 &middot; Speaker 1 &middot; Diagnosing a pattern the speaker also participates in</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="FEAR_BASED" data-group="G2">
+        <span class="quote-lens-tag lens-FEAR_BASED">Fear Based</span>
+        <p class="quote-text">"I am a creative person. I worry about copyright. That's the start of the conversation &mdash; because I don't trust it at all."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 2 &middot; Speaker 1 &middot; Modelling the creative professional resistance archetype</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="POTENTIAL_UNLOCKED" data-group="G3">
+        <span class="quote-lens-tag lens-POTENTIAL_UNLOCKED">Potential Unlocked</span>
+        <p class="quote-text">"You would become a responsibility sponge &mdash; you would incorporate from AI, and instead of evaluating 10 students per day you would do 100. You wouldn't be able to follow what the AI is doing. You would be taking responsibility for a system you don't understand."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 3 &middot; Speaker 1 &middot; Inventing original concept for human-AI teaming failure mode</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="WORKFLOW_STUCK" data-group="G3">
+        <span class="quote-lens-tag lens-WORKFLOW_STUCK">Workflow Stuck</span>
+        <p class="quote-text">"Standing there &mdash; okay, which regulation do I need to look at? What is the University level regulation, what's the study program level regulation, what's the module regulation &mdash; where?"</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 3 &middot; Speaker 2 &middot; Navigating disconnected regulatory PDFs in real-time</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="POTENTIAL_UNLOCKED" data-group="G4">
+        <span class="quote-lens-tag lens-POTENTIAL_UNLOCKED">Potential Unlocked</span>
+        <p class="quote-text">"No &mdash; they said, you're just checking if you are dangerous. So: what does danger look like in your fields? Figure out what is dangerous, and then figure out how are we going to avoid persons getting through our programs with dangerous [knowledge gaps]."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 4 &middot; Speaker 4/5 &middot; First Responder analogy reframes assessment as safety filter</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="SYSTEMIC_BLIND_SPOT" data-group="G4">
+        <span class="quote-lens-tag lens-SYSTEMIC_BLIND_SPOT">Systemic Blind Spot</span>
+        <p class="quote-text">"Universities through the centuries have changed. Yes, it's been fluid, and now we're just being called upon to do it faster. Yeah, and the problem is we don't want this to become theater."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 4 &middot; Speaker 1 &middot; Correctly frames change as historically inevitable, misses the agency to shape it</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="TOOL_THINKING" data-group="G5">
+        <span class="quote-lens-tag lens-TOOL_THINKING">Tool Thinking</span>
+        <p class="quote-text">"Update my slides, our statistics from 2025 &mdash; please update the numbers. My slides and give them all the teaching materials I've uploaded. Please create me an exam. Automatically generate exam questions."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 5 &middot; Speaker 2 &middot; AI as administrative assistant &mdash; no pedagogical co-design imagined</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="TOOL_THINKING" data-group="G5">
+        <span class="quote-lens-tag lens-TOOL_THINKING">Tool Thinking</span>
+        <p class="quote-text">"I see this tool more from the teaching perspective &mdash; I want a tool that allows me to reduce work hours from the human side."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 5 &middot; Speaker 2 &middot; Efficiency framing: time saved, not thinking transformed</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="SURFACE_USE" data-group="G6">
+        <span class="quote-lens-tag lens-SURFACE_USE">Surface Use</span>
+        <p class="quote-text">"When I asked ChatGPT give me the inspiration to make interesting exercise for my student &mdash; he gave me some inspiration. But when I asked give me the data &mdash; this not worked."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 6 &middot; Speaker 3 &middot; Logistics professor &middot; Single-shot prompting without iteration or constraint-setting</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="SURFACE_USE" data-group="G6">
+        <span class="quote-lens-tag lens-SURFACE_USE">Surface Use</span>
+        <p class="quote-text">"The data could be from a linear function and the formula is from a square function &mdash; completely different. I paid for ChatGPT for one month and he gave me the same answer."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 6 &middot; Speaker 3 &middot; Subscription payment treated as quality guarantee</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="AGENCY_LANGUAGE" data-group="G7">
+        <span class="quote-lens-tag lens-AGENCY_LANGUAGE">Agency Language</span>
+        <p class="quote-text">"You have to understand how it's working with your data and how the authority you give it &mdash; it can go on the internet and do stuff on your behalf."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 7 &middot; Speaker 1 &middot; Uses authority/delegation framing &mdash; most sophisticated mental model in room</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="TOOL_THINKING" data-group="G4">
+        <span class="quote-lens-tag lens-TOOL_THINKING">Tool Thinking</span>
+        <p class="quote-text">"Every subject has to teach the students to use AI within that subject. They have to learn how to check the information they get from AI &mdash; that is training, train, train, train, yes."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 4 &middot; Speaker 2 &middot; Integrates AI in curriculum but as a tool to verify, not a thinking partner</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="WORKFLOW_STUCK" data-group="G3">
+        <span class="quote-lens-tag lens-WORKFLOW_STUCK">Workflow Stuck</span>
+        <p class="quote-text">"That is completely different. I paid for ChatGPT one month and he gave me the same answer."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 6 &middot; Speaker 3 &middot; Payment as proxy for trust &mdash; no conceptual model for when AI fails and why</span></div>
+      </div>
+
+      <div class="quote-card" data-lens="FEAR_BASED" data-group="G2">
+        <span class="quote-lens-tag lens-FEAR_BASED">Fear Based</span>
+        <p class="quote-text">"I set a request using GDPR. I said I want my thesis to be deleted from the database of Turnitin. And of course, nobody knew what to do with it because we just talk about data protection. We don't enact on it."</p>
+        <div class="quote-attribution"><div class="quote-group-dot"></div><span>Group 2 &middot; Speaker 1 &middot; Demonstrates gap between data protection rhetoric and actual practice</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FACILITATOR RECOMMENDATIONS
+     ============================================================ -->
+<section id="recs" class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Section 07</span>
+      <h2 class="section-title">Facilitator Recommendations</h2>
+      <p class="section-sub">Each recommendation is grounded in a specific observed pattern, names the cognitive shift it targets, and proposes a concrete exercise or provocation for the next session.</p>
+    </div>
+
+    <div class="recs-list">
+
+      <div class="rec-card">
+        <div class="rec-num">01</div>
+        <div class="rec-section">
+          <div class="rec-section-label pattern">Observed Pattern</div>
+          <p class="rec-text">Every group defined their challenge as operational friction (too many PDFs, too many meetings, too many platforms) without questioning whether the underlying process is worth preserving. AI is imagined as a patch for broken workflows, not a lens for questioning them.</p>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-label shift">Cognitive Shift Targeted</div>
+          <p class="rec-text">From <em>AI reduces the cost of current work</em> to <em>AI enables us to ask whether this work should exist at all.</em> The shift from efficiency-within-the-system to questioning the system itself.</p>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-label exercise">Exercise / Provocation</div>
+          <p class="rec-text"><strong>"Zero-Based Workflow Audit."</strong> Ask each group: if your institution rebuilt from scratch with AI available from day one, which three of your current administrative processes would you never recreate? Then ask: why do they still exist? Use AI live to model the redesigned version.</p>
+        </div>
+      </div>
+
+      <div class="rec-card">
+        <div class="rec-num">02</div>
+        <div class="rec-section">
+          <div class="rec-section-label pattern">Observed Pattern</div>
+          <p class="rec-text">Ethics, GDPR, and data protection were invoked as conversation-stoppers rather than analytical frameworks. Participants with the least technical knowledge used these terms most confidently to justify non-engagement. One speaker explicitly diagnosed this as a "protection mechanism" &mdash; then continued to use the same mechanism.</p>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-label shift">Cognitive Shift Targeted</div>
+          <p class="rec-text">From <em>ethics as a shield against AI</em> to <em>ethics as a reasoning domain you engage WITH AI.</em> Ethical thinking is not a reason to avoid the technology &mdash; it is a domain where AI can actively help you think.</p>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-label exercise">Exercise / Provocation</div>
+          <p class="rec-text"><strong>"Steelman Your Own Resistance."</strong> Ask participants to articulate their specific ethical concern to an AI live &mdash; then ask the AI to validate the concern AND map the actual regulatory landscape around it. The goal: demonstrate that genuine ethical engagement requires engaging with the technology, not avoiding it.</p>
+        </div>
+      </div>
+
+      <div class="rec-card">
+        <div class="rec-num">03</div>
+        <div class="rec-section">
+          <div class="rec-section-label pattern">Observed Pattern</div>
+          <p class="rec-text">Group 6's logistics professor had a specific, solvable technical failure &mdash; mismatched function/data types from ChatGPT &mdash; and interpreted it as evidence that AI "doesn't work." One negative single-shot prompting experience closed an entire domain. Payment ("I paid for one month") was treated as a quality guarantee.</p>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-label shift">Cognitive Shift Targeted</div>
+          <p class="rec-text">From <em>AI as vending machine that dispenses correct or incorrect outputs</em> to <em>AI as a reasoning partner who needs context, constraints, and iteration to be useful.</em> Prompt failure is a signal to refine, not a verdict on the technology.</p>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-label exercise">Exercise / Provocation</div>
+          <p class="rec-text"><strong>"Debug the Prompt, Not the AI."</strong> Recreate the Group 6 failure live in the room. Show the original prompt, show the failure, then iteratively reframe the request &mdash; add constraints, specify the data structure needed, ask the AI to reason step by step before answering. Demonstrate that the "broken" tool was underprompted, not unreliable.</p>
+        </div>
+      </div>
+
+      <div class="rec-card">
+        <div class="rec-num">04</div>
+        <div class="rec-section">
+          <div class="rec-section-label pattern">Observed Pattern</div>
+          <p class="rec-text">Group 3's "responsibility sponge" and Group 4's "checking if you are dangerous" reframe are the room's two most generative ideas. Both came and went without being named as significant, developed further, or reflected back to the group as conceptual contributions worth keeping.</p>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-label shift">Cognitive Shift Targeted</div>
+          <p class="rec-text">From <em>AI adoption decisions</em> to <em>human-AI system design.</em> When participants invent concepts like "responsibility sponge," they are designing the cognitive architecture of a human-AI team &mdash; and they need to be told that's what they're doing.</p>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-label exercise">Exercise / Provocation</div>
+          <p class="rec-text"><strong>"Name the New Problem."</strong> Open the next session with both concepts on screen. Ask: <em>What new risks does AI create that didn't exist before &mdash; not because AI is bad, but because AI changes the human's role in the system?</em> Invite the room to add to the catalogue. Make visible that they are doing original conceptual work.</p>
+        </div>
+      </div>
+
+      <div class="rec-card">
+        <div class="rec-num">05</div>
+        <div class="rec-section">
+          <div class="rec-section-label pattern">Observed Pattern</div>
+          <p class="rec-text">Faculty imagined AI generating exam questions and updating slides &mdash; applying AI to the deliverable layer of academic work. No participant proposed using AI to rethink what exam questions are for, or what a lecture slide should accomplish. The pedagogical model is treated as fixed.</p>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-label shift">Cognitive Shift Targeted</div>
+          <p class="rec-text">From <em>AI generates content for current tasks</em> to <em>AI as thought partner for redesigning educational purpose and method.</em> The question is not "can AI make my course easier to run?" but "what would this course be if designed for an AI-native learner?"</p>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-label exercise">Exercise / Provocation</div>
+          <p class="rec-text"><strong>"Learning Outcome Stress-Test."</strong> Pick one real course. Use AI live to: (1) identify which learning outcomes AI can now trivially achieve on behalf of a student, (2) generate three new outcomes that AI cannot trivially achieve, (3) redesign one assessment around what only a human can demonstrate. Then ask: what are you actually testing?</p>
+        </div>
+      </div>
+
+      <div class="rec-card">
+        <div class="rec-num">06</div>
+        <div class="rec-section">
+          <div class="rec-section-label pattern">Observed Pattern</div>
+          <p class="rec-text">Every group described AI use as a solo, private activity &mdash; "you feed it," "you get output." No group described collaborative or institutional uses: co-reasoning in meetings, team prompting sessions, AI as shared reasoning infrastructure. AI is a personal tool, not a collective intelligence.</p>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-label shift">Cognitive Shift Targeted</div>
+          <p class="rec-text">From <em>AI as personal efficiency tool</em> to <em>AI as shared reasoning infrastructure for groups and institutions.</em> The power of AI compounds when the collective intelligence of a team is augmented, not just each individual's private work.</p>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-label exercise">Exercise / Provocation</div>
+          <p class="rec-text"><strong>"Institutional Intelligence Session."</strong> Run an AI session in the room &mdash; projected, together. Feed the group's actual problem (from this workshop) into an AI live. Let the group interrogate, redirect, and extend the AI's reasoning collectively. The goal: experience AI as a shared cognitive space, not a private assistant.</p>
+        </div>
+      </div>
+
+      <div class="rec-card">
+        <div class="rec-num">07</div>
+        <div class="rec-section">
+          <div class="rec-section-label pattern">Observed Pattern</div>
+          <p class="rec-text">Group 7's discussion of agentic AI (Open Claude) was the most sophisticated in the room but was framed as requiring a "developer mindset" that others cannot attain. The insight about authority design and guardrails was not offered as a general principle that non-technical participants could use.</p>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-label shift">Cognitive Shift Targeted</div>
+          <p class="rec-text">From <em>AI deployment as a technical problem</em> to <em>AI deployment as an authority design problem</em> that every institutional leader must engage with, regardless of technical background. Deciding what AI can do autonomously is a governance decision, not a technical one.</p>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-label exercise">Exercise / Provocation</div>
+          <p class="rec-text"><strong>"Authority Mapping."</strong> Ask each person to draw three concentric zones: <em>What decisions do you want AI to make autonomously? What requires human confirmation? What must always be human-only?</em> Then ask: for each boundary, what would cause you to move it inward or outward? This surfaces tacit assumptions about trust, accountability, and professional identity.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     VOCABULARY FINGERPRINT
+     ============================================================ -->
+<section id="vocab" class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Section 08</span>
+      <h2 class="section-title">Vocabulary Fingerprint</h2>
+      <p class="section-sub">The exact words and phrases used to describe AI across all 7 groups, colour-coded by the framing they encode. Language is the most reliable indicator of mental model.</p>
+    </div>
+
+    <div class="vocab-grid">
+
+      <div class="vocab-column vocab-agency">
+        <div class="vocab-column-head">Agency Language</div>
+        <div class="vocab-words">
+          <div class="vocab-word">"he gave me" <span class="vocab-freq">G6 &times;4</span></div>
+          <div class="vocab-word">"he knows" <span class="vocab-freq">G6 &times;1</span></div>
+          <div class="vocab-word">"it decides" <span class="vocab-freq">G7 &times;1</span></div>
+          <div class="vocab-word">"it's doing magic stuff" <span class="vocab-freq">G7 &times;1</span></div>
+          <div class="vocab-word">"the authority you give it" <span class="vocab-freq">G7 &times;2</span></div>
+          <div class="vocab-word">"do stuff on your behalf" <span class="vocab-freq">G7 &times;1</span></div>
+          <div class="vocab-word">"representing you" <span class="vocab-freq">G7 &times;1</span></div>
+          <div class="vocab-word">"gave me inspiration" <span class="vocab-freq">G6 &times;2</span></div>
+        </div>
+      </div>
+
+      <div class="vocab-column vocab-passive">
+        <div class="vocab-column-head">Passive / Tool Framing</div>
+        <div class="vocab-words">
+          <div class="vocab-word">"you feed it" <span class="vocab-freq">G2 &times;1</span></div>
+          <div class="vocab-word">"it outputs" <span class="vocab-freq">G5 &times;2</span></div>
+          <div class="vocab-word">"it generates" <span class="vocab-freq">G5 &times;3</span></div>
+          <div class="vocab-word">"give it to" / "ask it to" <span class="vocab-freq">G3 &times;4</span></div>
+          <div class="vocab-word">"use the tool" <span class="vocab-freq">G5 &times;3</span></div>
+          <div class="vocab-word">"ChatGPT" (as generic noun) <span class="vocab-freq">G6 &times;3</span></div>
+          <div class="vocab-word">"plug it in" <span class="vocab-freq">G5 &times;1</span></div>
+          <div class="vocab-word">"it gives me answers" <span class="vocab-freq">G6 &times;2</span></div>
+          <div class="vocab-word">"check it" / "verify it" <span class="vocab-freq">G3 &times;3</span></div>
+        </div>
+      </div>
+
+      <div class="vocab-column vocab-threat">
+        <div class="vocab-column-head">Threat Language</div>
+        <div class="vocab-words">
+          <div class="vocab-word">"I don't trust it" <span class="vocab-freq">G2 &times;3</span></div>
+          <div class="vocab-word">"makes things up" <span class="vocab-freq">G2 &times;1</span></div>
+          <div class="vocab-word">"dangerous" <span class="vocab-freq">G4 &times;4</span></div>
+          <div class="vocab-word">"data protection" <span class="vocab-freq">G2 &times;5</span></div>
+          <div class="vocab-word">"copyright" <span class="vocab-freq">G2 &times;2</span></div>
+          <div class="vocab-word">"free reign" <span class="vocab-freq">G7 &times;1</span></div>
+          <div class="vocab-word">"responsibility sponge" <span class="vocab-freq">G3 &times;1</span></div>
+          <div class="vocab-word">"cheating" / "AI-assisted" <span class="vocab-freq">G4 &times;2</span></div>
+          <div class="vocab-word">"theater" (superficial compliance) <span class="vocab-freq">G4 &times;1</span></div>
+        </div>
+      </div>
+
+      <div class="vocab-column vocab-empower">
+        <div class="vocab-column-head">Empowerment Language</div>
+        <div class="vocab-words">
+          <div class="vocab-word">"immensely powerful" <span class="vocab-freq">G7 &times;1</span></div>
+          <div class="vocab-word">"filling in between" <span class="vocab-freq">G1 &times;1</span></div>
+          <div class="vocab-word">"simulate the experience" <span class="vocab-freq">G3 &times;1</span></div>
+          <div class="vocab-word">"guardrail" <span class="vocab-freq">G7 &times;2</span></div>
+          <div class="vocab-word">"very, very capable" <span class="vocab-freq">G5 &times;1</span></div>
+          <div class="vocab-word">"thinking with AI" <span class="vocab-freq">ABSENT across all</span></div>
+          <div class="vocab-word">"reasoning together" <span class="vocab-freq">ABSENT across all</span></div>
+          <div class="vocab-word">"collaborative intelligence" <span class="vocab-freq">ABSENT across all</span></div>
+          <div class="vocab-word">"co-design" <span class="vocab-freq">ABSENT across all</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="insight-box">
+      <h3>Key Vocabulary Insight</h3>
+      <p>The most significant finding in the vocabulary audit is an <strong>absence</strong>: no participant across any of the 7 groups used the phrases <em>"thinking with AI," "reasoning together," "collaborative intelligence,"</em> or <em>"co-design."</em> These are precisely the concepts that define the cognitive shift this workshop is designed to catalyse. Agency language appears almost exclusively in Group 7 and in threat/negative contexts &mdash; participants anthropomorphise AI when they fear it, but not when they use it. The empowerment column is dominated by efficiency gains ("reduce work hours") rather than cognitive gains. The shift from passive-tool language to genuine collaborative language is the linguistic marker of the cognitive shift this cohort has not yet made &mdash; and the single most actionable indicator for facilitator follow-up.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:var(--teal-900);color:rgba(255,255,255,0.45);padding:28px 24px;text-align:center;font-size:0.76rem;line-height:1.8;">
+  <div style="max-width:1400px;margin:0 auto;">
+    Erasmus+ Teaching Mobility &middot; University of Akureyri &middot; April 15, 2025<br>
+    Central evaluative lens: <em style="color:rgba(255,255,255,0.6);">from using AI as a tool to thinking WITH AI as a collaborative intelligence.</em><br>
+    All quotes are verbatim from speech-to-text transcripts. STT artefacts preserved intentionally &mdash; the messiness is data.
+  </div>
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+/* ============================================================
+   THEME TOGGLE
+   ============================================================ */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? 'Dark mode' : 'Light mode';
+  if (window.lensChartInstance) updateChartTheme();
+}
+
+/* ============================================================
+   NAV SCROLL
+   ============================================================ */
+function navScrollTo(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const navH = document.querySelector('.nav').offsetHeight + 32;
+  const top = el.getBoundingClientRect().top + window.scrollY - navH;
+  window.scrollTo({ top, behavior: 'smooth' });
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+// Passive scroll spy
+const sectionIds = ['overview','lens','clusters','models','breakthroughs','quotes','recs','vocab'];
+window.addEventListener('scroll', () => {
+  const pos = window.scrollY + 80;
+  sectionIds.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (pos >= el.offsetTop && pos < el.offsetTop + el.offsetHeight) {
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      const links = document.querySelectorAll('.nav-link');
+      if (links[i]) links[i].classList.add('active');
+    }
+  });
+}, { passive: true });
+
+/* ============================================================
+   CLUSTER EXPAND / COLLAPSE
+   ============================================================ */
+function toggleCluster(head) {
+  head.closest('.cluster-card').classList.toggle('open');
+}
+
+/* ============================================================
+   CLUSTER GROUP FILTER
+   ============================================================ */
+function filterClusters(group, btn) {
+  document.querySelectorAll('#clusterGroupFilter .gfbtn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('#clustersGrid .cluster-card').forEach(card => {
+    if (group === 'all') {
+      card.style.display = '';
+    } else {
+      const groups = card.getAttribute('data-groups') || '';
+      card.style.display = groups.includes(group) ? '' : 'none';
+    }
+  });
+}
+
+/* ============================================================
+   QUOTES FILTER
+   ============================================================ */
+function filterQuotes(lens, btn) {
+  document.querySelectorAll('.quotes-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.quote-card').forEach(card => {
+    if (lens === 'all') {
+      card.classList.remove('hidden');
+    } else {
+      card.classList.toggle('hidden', card.getAttribute('data-lens') !== lens);
+    }
+  });
+}
+
+/* ============================================================
+   LENS FILTER (cross-section)
+   ============================================================ */
+let activeLens = null;
+
+function filterByLens(lens) {
+  if (activeLens === lens) {
+    activeLens = null;
+    document.querySelectorAll('.lens-item').forEach(i => i.classList.remove('active'));
+    document.querySelectorAll('.quote-card').forEach(c => c.classList.remove('hidden'));
+    document.getElementById('filterBar').classList.remove('visible');
+    document.getElementById('filterTags').innerHTML = '';
+    return;
+  }
+  activeLens = lens;
+  document.querySelectorAll('.lens-item').forEach(i => {
+    i.classList.toggle('active', i.getAttribute('data-lens') === lens);
+  });
+  document.querySelectorAll('.quote-card').forEach(card => {
+    card.classList.toggle('hidden', card.getAttribute('data-lens') !== lens);
+  });
+  document.getElementById('filterBar').classList.add('visible');
+  document.getElementById('filterTags').innerHTML = `<span class="filter-tag">${lens} <span class="filter-x" onclick="clearAllFilters()">&times;</span></span>`;
+  // Scroll to quotes
+  setTimeout(() => {
+    const el = document.getElementById('quotes');
+    if (!el) return;
+    const navH = document.querySelector('.nav').offsetHeight + 32;
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - navH, behavior: 'smooth' });
+  }, 120);
+}
+
+function clearAllFilters() {
+  activeLens = null;
+  document.querySelectorAll('.lens-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.quote-card').forEach(c => c.classList.remove('hidden'));
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  const firstBtn = document.querySelector('.quotes-filters .filter-btn');
+  if (firstBtn) firstBtn.classList.add('active');
+  document.getElementById('filterBar').classList.remove('visible');
+  document.getElementById('filterTags').innerHTML = '';
+}
+
+/* ============================================================
+   CHART.JS — COGNITIVE LENS DONUT
+   ============================================================ */
+const LENS_DATA = {
+  labels: ['Tool Thinking','Workflow Stuck','Fear Based','Systemic Blind Spot','Potential Unlocked','Surface Use'],
+  values: [10, 6, 5, 3, 3, 3],
+  colors: ['#1a7fa8','#7b52c8','#b03a3a','#c87941','#2e7d5a','#8a9aaa']
+};
+
+window.lensChartInstance = null;
+
+function getSurfaceColor() {
+  return getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() || '#fff';
+}
+
+function buildLensChart() {
+  const canvas = document.getElementById('lensChart');
+  if (!canvas || !window.Chart) {
+    if (document.getElementById('lensChartFallback')) {
+      document.getElementById('lensChartFallback').style.display = 'block';
+    }
+    return;
+  }
+  if (window.lensChartInstance) { window.lensChartInstance.destroy(); }
+  window.lensChartInstance = new Chart(canvas.getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: LENS_DATA.labels,
+      datasets: [{
+        data: LENS_DATA.values,
+        backgroundColor: LENS_DATA.colors,
+        borderColor: getSurfaceColor(),
+        borderWidth: 4,
+        hoverBorderWidth: 0,
+        hoverOffset: 10,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '66%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              const total = ctx.dataset.data.reduce((a,b) => a+b, 0);
+              const pct = Math.round(ctx.raw / total * 100);
+              return ` ${ctx.label}: ${ctx.raw} pain points (${pct}%)`;
+            }
+          },
+          backgroundColor: 'rgba(6,45,54,0.95)',
+          titleFont: { family: 'Inter', size: 12, weight: '600' },
+          bodyFont: { family: 'Inter', size: 12 },
+          padding: 14,
+          cornerRadius: 8,
+        }
+      },
+      animation: { animateRotate: true, duration: 900, easing: 'easeOutCubic' }
+    }
+  });
+}
+
+function updateChartTheme() {
+  if (!window.lensChartInstance) return;
+  window.lensChartInstance.data.datasets[0].borderColor = getSurfaceColor();
+  window.lensChartInstance.update();
+}
+
+// Init
+if (window.Chart) {
+  buildLensChart();
+} else {
+  window.addEventListener('load', function() {
+    if (window.Chart) buildLensChart();
+    else if (document.getElementById('lensChartFallback')) {
+      document.getElementById('lensChartFallback').style.display = 'block';
+    }
+  });
+}
+
+/* ============================================================
+   GAP BAR ANIMATION (IntersectionObserver)
+   ============================================================ */
+const barObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const fill = entry.target;
+      const target = fill.getAttribute('data-target');
+      if (target) {
+        fill.style.width = target + '%';
+        barObserver.unobserve(fill);
+      }
+    }
+  });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('.gap-bar-fill[data-target]').forEach(bar => {
+  barObserver.observe(bar);
+});
+</script>
+</body>
+</html>
